@@ -16,5 +16,9 @@ public class MainActivity extends AppCompatActivity {
             // Chuyển sang LoginActivity
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         });
+        Button btnGoToBooking = findViewById(R.id.btn_go_to_booking); // Thêm button trong activity_main.xml
+        btnGoToBooking.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, BookingActivity.class));
+        });
     }
 }
