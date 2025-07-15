@@ -6,6 +6,11 @@ import com.example.porestaurant.model.UpdateUserRequest;
 import com.example.porestaurant.model.User;
 import com.example.porestaurant.model.Menu;
 import com.example.porestaurant.model.Category;
+import com.example.porestaurant.model.TableDTO;
+import com.example.porestaurant.model.TableBookingRequest;
+import com.example.porestaurant.model.TableStatusUpdateRequest;
+
+import java.util.List;
 
 import java.util.List;
 
@@ -67,4 +72,16 @@ public interface ApiService {
     @DELETE("Category/{id}")
     Call<Void> deleteCategory(@Path("id") int id);
 
+}
+    @GET("tables/available")
+    Call<List<TableDTO>> getAvailableTables();
+
+    @POST("tables/book")
+    Call<TableDTO> bookTable(@Body TableBookingRequest request);
+
+    @PUT("tables/{id}/status")
+    Call<TableDTO> updateTableStatus(@Path("id") int id, @Body TableStatusUpdateRequest request);
+
+    @PUT("tables/{id}/cancel")
+    Call<TableDTO> cancelTable(@Path("id") int id);
 }
