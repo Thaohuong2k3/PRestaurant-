@@ -13,8 +13,12 @@ public class MainActivity extends AppCompatActivity {
 
         Button btnLogin = findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(v -> {
-            // Chuyển sang LoginActivity
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        });
+
+        Button btnMenu = findViewById(R.id.btnMenu);
+        btnMenu.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, MenuActivity.class));
         });
     }
 }
