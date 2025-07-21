@@ -1,7 +1,9 @@
 package com.example.porestaurant.network;
 
+import com.example.porestaurant.model.ForgotPasswordRequest;
 import com.example.porestaurant.model.GoogleLoginRequest;
 import com.example.porestaurant.model.LoginRequest;
+import com.example.porestaurant.model.MessageResponse;
 import com.example.porestaurant.model.UpdateUserRequest;
 import com.example.porestaurant.model.User;
 import com.example.porestaurant.model.Menu;
@@ -40,6 +42,9 @@ public interface ApiService {
             @Path("id") int userId,
             @Body UpdateUserRequest request);
 
+    @POST("users/forgot-password")
+    Call<ResponseBody> forgotPassword(@Body String email);
+
     // ====== MENU ENDPOINTS ======
     @GET("Menu")
     Call<List<Menu>> getAllMenus();
@@ -72,7 +77,6 @@ public interface ApiService {
     @DELETE("Category/{id}")
     Call<Void> deleteCategory(@Path("id") int id);
 
-}
     @GET("tables/available")
     Call<List<TableDTO>> getAvailableTables();
 

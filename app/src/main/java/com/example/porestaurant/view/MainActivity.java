@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
         Button btnMenu = findViewById(R.id.btnMenu);
         btnMenu.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, MenuActivity.class));
+        });
+
         Button btnGoToBooking = findViewById(R.id.btn_go_to_booking); // Thêm button trong activity_main.xml
         btnGoToBooking.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, BookingActivity.class));
