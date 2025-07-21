@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button btnGoToBooking = findViewById(R.id.btn_go_to_booking);
+
         btnGoToBooking.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, BookingActivity.class));
         });

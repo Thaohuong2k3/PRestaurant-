@@ -30,6 +30,7 @@
         <activity android:name=".view.BookingActivity" />
         <activity android:name=".view.CreateMenuActivity" />
         <activity android:name=".view.CartActivity" />
+        <activity android:name=".view.ForgotPasswordActivity" />
     </application>
 
 </manifest>

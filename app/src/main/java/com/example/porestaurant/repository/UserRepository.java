@@ -1,6 +1,10 @@
 package com.example.porestaurant.repository;
+import android.util.Log;
+
+import com.example.porestaurant.model.ForgotPasswordRequest;
 import com.example.porestaurant.model.GoogleLoginRequest;
 import com.example.porestaurant.model.LoginRequest;
+import com.example.porestaurant.model.MessageResponse;
 import com.example.porestaurant.model.UpdateUserRequest;
 import com.example.porestaurant.model.User;
 import com.example.porestaurant.network.ApiClient;
@@ -102,6 +106,39 @@ public class UserRepository {
                 callback.onError("Lỗi kết nối: " + t.getMessage());
             }
         });
+    }
+    public void forgotPassword(String email, final ForgotPasswordCallback callback) {
+        // Chuyển email sang raw JSON string: "l@gmail.com"
+        String rawEmail = "\"" + email + "\"";
+        Log.d("FORGOT_API", "Email gửi lên: " + rawEmail);
+        apiService.forgotPassword(rawEmail).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    String msg = "Gửi yêu cầu thành công!";
+                    try {
+                        if (response.body() != null)
+                            msg = response.body().string();
+                    } catch (Exception ignored) {}
+                    callback.onSuccess(msg);
+                } else {
+                    String msg = "Yêu cầu thất bại";
+                    try {
+                        msg = response.errorBody() != null ? response.errorBody().string() : response.message();
+                    } catch (Exception ignored) {}
+                    callback.onError(msg);
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callback.onError("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
+    public interface ForgotPasswordCallback {
+        void onSuccess(String message);
+        void onError(String error);
     }
 
     public interface UpdateCallback {

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ public class ActivityProfile extends AppCompatActivity {
     private EditText edtProfileFullName, edtProfilePassword, edtProfileConfirmPass;
     private TextView tvProfileEmail;
     private Button btnProfileUpdate, btnProfileLogout;
+    private ImageView btnProfileBack; // Thêm khai báo này
     private SharedPreferences sharedPreferences;
     private UserRepository userRepository;
     private int userId;
@@ -26,17 +28,19 @@ public class ActivityProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Ánh xạ view
         edtProfileFullName = findViewById(R.id.edtProfileFullName);
         edtProfilePassword = findViewById(R.id.edtProfilePassword);
         edtProfileConfirmPass = findViewById(R.id.edtProfileConfirmPass);
         tvProfileEmail = findViewById(R.id.tvProfileEmail);
         btnProfileUpdate = findViewById(R.id.btnProfileUpdate);
         btnProfileLogout = findViewById(R.id.btnProfileLogout);
+        btnProfileBack = findViewById(R.id.btnProfileBack); // Ánh xạ nút back
 
         userRepository = new UserRepository();
         sharedPreferences = getSharedPreferences("LOGIN_PREF", MODE_PRIVATE);
 
-        // Lấy thông tin từ SharedPreferences (PHẢI lưu đủ ở Login thành công)
+        // Lấy thông tin từ SharedPreferences
         userId = sharedPreferences.getInt("userId", -1);
         String fullName = sharedPreferences.getString("fullName", "");
         String email = sharedPreferences.getString("email", "");
@@ -44,11 +48,19 @@ public class ActivityProfile extends AppCompatActivity {
         edtProfileFullName.setText(fullName);
         tvProfileEmail.setText(email);
 
+        // Sự kiện update profile
         btnProfileUpdate.setOnClickListener(v -> doUpdateProfile());
+
+        // Sự kiện logout
         btnProfileLogout.setOnClickListener(v -> {
             sharedPreferences.edit().clear().apply();
             startActivity(new Intent(ActivityProfile.this, LoginActivity.class));
             finish();
+        });
+
+        // Sự kiện back
+        btnProfileBack.setOnClickListener(v -> {
+            onBackPressed(); // hoặc finish();
         });
     }
 
@@ -87,3 +99,4 @@ public class ActivityProfile extends AppCompatActivity {
         });
     }
 }
+

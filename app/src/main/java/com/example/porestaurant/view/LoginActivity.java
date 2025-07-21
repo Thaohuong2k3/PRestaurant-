@@ -59,6 +59,10 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });
         btnLogin.setOnClickListener(v -> doLogin());
+        TextView tvForgot = findViewById(R.id.tvForgot);
+        tvForgot.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
+        });
 
         // Google Sign-In config (THAY client_id web thật của bạn)
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
