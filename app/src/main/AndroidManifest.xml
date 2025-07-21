@@ -28,6 +28,8 @@
         <activity android:name=".view.ActivityProfile" />
         <activity android:name=".view.RegisterActivity" />
         <activity android:name=".view.BookingActivity" />
+        <activity android:name=".view.CreateMenuActivity" />
+        <activity android:name=".view.CartActivity" />
     </application>
 
 </manifest>

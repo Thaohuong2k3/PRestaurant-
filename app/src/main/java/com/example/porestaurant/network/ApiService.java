@@ -12,7 +12,6 @@ import com.example.porestaurant.model.TableStatusUpdateRequest;
 
 import java.util.List;
 
-import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -72,7 +71,6 @@ public interface ApiService {
     @DELETE("Category/{id}")
     Call<Void> deleteCategory(@Path("id") int id);
 
-}
     @GET("tables/available")
     Call<List<TableDTO>> getAvailableTables();
 
