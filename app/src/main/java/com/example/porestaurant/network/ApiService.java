@@ -1,5 +1,6 @@
 package com.example.porestaurant.network;
 
+import com.example.porestaurant.model.DirectionsResponse;
 import com.example.porestaurant.model.GoogleLoginRequest;
 import com.example.porestaurant.model.LoginRequest;
 import com.example.porestaurant.model.UpdateUserRequest;
@@ -22,6 +23,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -72,7 +74,6 @@ public interface ApiService {
     @DELETE("Category/{id}")
     Call<Void> deleteCategory(@Path("id") int id);
 
-}
     @GET("tables/available")
     Call<List<TableDTO>> getAvailableTables();
 
@@ -84,4 +85,12 @@ public interface ApiService {
 
     @PUT("tables/{id}/cancel")
     Call<TableDTO> cancelTable(@Path("id") int id);
+
+    // ====== MAP ENDPOINTS ======
+    @GET("maps/api/directions/json")
+    Call<DirectionsResponse> getDirections(
+            @Query("origin") String origin,
+            @Query("destination") String destination,
+            @Query("key") String apiKey
+    );
 }
