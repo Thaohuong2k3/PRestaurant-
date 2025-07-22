@@ -1,66 +1,84 @@
 package com.example.porestaurant.view;
 
+import android.content.Context;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import com.example.porestaurant.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ToolBarFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ToolBarFragment extends Fragment {
+public class ToolbarFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ToolBarFragment() {
-        // Required empty public constructor
+    public interface ToolbarListener {
+        void onSearchClicked();
+        void onFilterClicked();
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ToolBarFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ToolBarFragment newInstance(String param1, String param2) {
-        ToolBarFragment fragment = new ToolBarFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private ToolbarListener toolbarListener;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof ToolbarListener) {
+            toolbarListener = (ToolbarListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement ToolbarListener");
         }
     }
 
+    private ImageView hamburgerMenu;
+    private ImageView searchIcon;
+    private ImageView filterIcon;
+    private DrawerLayout drawerLayout;
+
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_tool_bar, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_tool_bar, container, false);
+
+        // Initialize views
+        initViews(view);
+
+        // Setup drawer
+        assert getActivity() != null;
+        drawerLayout = getActivity().findViewById(R.id.drawer_layout);
+
+        // Setup click listeners
+        setupClickListeners();
+
+        return view;
+    }
+
+    private void initViews(View view) {
+        hamburgerMenu = view.findViewById(R.id.iv_hamburger);
+        searchIcon = view.findViewById(R.id.iv_search);
+        filterIcon = view.findViewById(R.id.iv_filter);
+    }
+
+    private void setupClickListeners() {
+        hamburgerMenu.setOnClickListener(v -> {
+            drawerLayout.openDrawer(GravityCompat.START);
+        });
+
+        searchIcon.setOnClickListener(v -> {
+            if (toolbarListener != null) {
+                toolbarListener.onSearchClicked();
+            }
+        });
+
+        filterIcon.setOnClickListener(v -> {
+            if (toolbarListener != null) {
+                toolbarListener.onFilterClicked();
+            }
+        });
     }
 }
