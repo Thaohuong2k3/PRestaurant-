@@ -8,9 +8,9 @@ public class Menu {
     private int categoryId;
     private String categoryName;
     private boolean isAvailable;
-    private byte[] imageData;
+    private transient byte[] imageData;
     private String imageMimeType;
-
+    private String imageDataBase64;
     public static final String CREATE_TABLE =
             "CREATE TABLE IF NOT EXISTS Menu (" +
                     "menuId INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -51,6 +51,13 @@ public class Menu {
 
     public String getImageMimeType() { return imageMimeType; }
     public void setImageMimeType(String imageMimeType) { this.imageMimeType = imageMimeType; }
+    public String getImageDataBase64() {
+        return imageDataBase64;
+    }
+
+    public void setImageDataBase64(String imageDataBase64) {
+        this.imageDataBase64 = imageDataBase64;
+    }
 
     @Override
     public String toString() {

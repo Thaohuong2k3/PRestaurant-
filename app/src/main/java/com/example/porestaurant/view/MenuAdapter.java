@@ -1,6 +1,8 @@
 package com.example.porestaurant.view;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,17 +58,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
         byte[] imageData = menu.getImageData();
         if (imageData != null && imageData.length > 0) {
-            Glide.with(context)
-                    .asBitmap()
-                    .load(imageData)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.no_image)
-                    .error(R.drawable.no_image)
-                    .into(holder.ivMenuImage);
+            holder.ivMenuImage.setImageBitmap(
+                    BitmapFactory.decodeByteArray(imageData, 0,imageData.length));
         } else {
-            Glide.with(context)
-                    .load(R.drawable.no_image)
-                    .into(holder.ivMenuImage);
+            holder.ivMenuImage.setImageResource(R.drawable.no_image);
         }
     }
 
@@ -75,6 +70,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         return menuList.size();
     }
 
+    public void updateList(List<Menu> newList) {
+        menuList = newList;
+        notifyDataSetChanged();
+    }
     public static class MenuViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDescription, tvPrice;
         ImageView ivMenuImage;

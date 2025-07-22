@@ -12,30 +12,36 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.porestaurant.R;
 import com.example.porestaurant.model.Menu;
-import com.example.porestaurant.network.ApiClient;
-import com.example.porestaurant.network.ApiService;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import com.example.porestaurant.model.CartStorage;
+import com.example.porestaurant.repository.MenuRepository;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class MenuActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerViewMenu;
+    private RecyclerView recyclerViewCategory;
     private MenuAdapter menuAdapter;
+    private CategoryAdapter categoryAdapter;
     private Button btnCart;
+
+    private List<Menu> allMenus = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        recyclerView = findViewById(R.id.recyclerMenu);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewMenu = findViewById(R.id.recyclerMenu);
+        recyclerViewMenu.setLayoutManager(new LinearLayoutManager(this));
+
+        recyclerViewCategory = findViewById(R.id.recyclerCategory);
+        recyclerViewCategory.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        );
 
         Button btnCreateMenu = findViewById(R.id.btnCreateMenu);
         btnCart = findViewById(R.id.btnCart);
@@ -61,34 +67,63 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void loadMenus() {
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<List<Menu>> call = apiService.getAllMenus();
+        MenuRepository repository = new MenuRepository();
 
-        call.enqueue(new Callback<List<Menu>>() {
+        repository.getAllMenus(new MenuRepository.MenuCallback() {
             @Override
-            public void onResponse(Call<List<Menu>> call, Response<List<Menu>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Menu> menuList = response.body();
+            public void onSuccess(List<Menu> menuList) {
+                runOnUiThread(() -> {
+                    allMenus = menuList;
 
+                    // Setup menu list
                     menuAdapter = new MenuAdapter(MenuActivity.this, menuList, menu -> {
                         CartStorage.addToCart(MenuActivity.this, menu);
                         updateCartCount();
                         Toast.makeText(MenuActivity.this, "Added to cart: " + menu.getName(), Toast.LENGTH_SHORT).show();
-                        updateCartCount(); // update UI
                     });
+                    recyclerViewMenu.setAdapter(menuAdapter);
 
-                    recyclerView.setAdapter(menuAdapter);
-                } else {
-                    Toast.makeText(MenuActivity.this, "Failed to load menu", Toast.LENGTH_SHORT).show();
-                }
+                    // Setup category filter
+                    setupCategoryFilter(menuList);
+                });
             }
 
             @Override
-            public void onFailure(Call<List<Menu>> call, Throwable t) {
-                Toast.makeText(MenuActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("MenuActivity", "onFailure: ", t);
+            public void onError(String errorMessage) {
+                runOnUiThread(() -> {
+                    Toast.makeText(MenuActivity.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    Log.e("MenuActivity", "loadMenus: " + errorMessage);
+                });
             }
         });
+    }
+
+    private void setupCategoryFilter(List<Menu> menuList) {
+        Set<String> categorySet = new LinkedHashSet<>();
+        categorySet.add("All"); // Default
+        for (Menu menu : menuList) {
+            if (menu.getCategoryName() != null) {
+                categorySet.add(menu.getCategoryName());
+            }
+        }
+
+        List<String> categories = new ArrayList<>(categorySet);
+
+        categoryAdapter = new CategoryAdapter(categories, selectedCategory -> {
+            if ("All".equals(selectedCategory)) {
+                menuAdapter.updateList(allMenus);
+            } else {
+                List<Menu> filtered = new ArrayList<>();
+                for (Menu m : allMenus) {
+                    if (selectedCategory.equals(m.getCategoryName())) {
+                        filtered.add(m);
+                    }
+                }
+                menuAdapter.updateList(filtered);
+            }
+        });
+
+        recyclerViewCategory.setAdapter(categoryAdapter);
     }
 
     private void updateCartCount() {
@@ -100,4 +135,3 @@ public class MenuActivity extends AppCompatActivity {
         btnCart.setText("Cart (" + count + ")");
     }
 }
-
