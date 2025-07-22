@@ -14,15 +14,17 @@ import com.example.porestaurant.model.TableBookingRequest;
 import com.example.porestaurant.model.TableStatusUpdateRequest;
 import com.example.porestaurant.model.VerifyOtpRequest;
 
-import java.util.List;
-
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -45,8 +47,6 @@ public interface ApiService {
 
         @POST("users/forgot-password")
         Call<ResponseBody> forgotPassword(@Body String email);
-        // @POST("users/forgotpassapp/request-otp")
-        // Call<MessageResponse> requestOtp(@Body ForgotPasswordRequest request);
 
         // @POST("users/forgotpassapp/verify-otp")
         // Call<MessageResponse> verifyOtp(@Body VerifyOtpRequest request);
@@ -55,6 +55,16 @@ public interface ApiService {
 
         @POST("users/forgotpassapp/verify-otp")
         Call<ResponseBody> verifyOtp(@Body VerifyOtpRequest request);
+
+        @Multipart
+        @POST("menu")
+        Call<Menu> createMenu(
+                        @Part("name") RequestBody name,
+                        @Part("description") RequestBody description,
+                        @Part("price") RequestBody price,
+                        @Part("categoryId") RequestBody categoryId,
+                        @Part("isAvailable") RequestBody isAvailable,
+                        @Part MultipartBody.Part image);
 
         // ====== MENU ENDPOINTS ======
         @GET("Menu")

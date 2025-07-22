@@ -1,28 +1,35 @@
 package com.example.porestaurant.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Base64;
+import android.view.View;
 import android.widget.*;
+
 import androidx.annotation.Nullable;
-import com.bumptech.glide.Glide;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.porestaurant.R;
+import com.example.porestaurant.model.Category;
 import com.example.porestaurant.model.Menu;
 import com.example.porestaurant.network.ApiClient;
 import com.example.porestaurant.network.ApiService;
+import com.example.porestaurant.repository.MenuRepository;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateMenuActivity extends Activity {
+public class CreateMenuActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -30,11 +37,14 @@ public class CreateMenuActivity extends Activity {
     private Spinner spinnerCategory;
     private CheckBox checkIsAvailable;
     private ImageView imgPreview;
-    private byte[] imageData = null;
-    private String imageMimeType = "";
+    private Button btnChooseImage, btnSave;
 
-    private String[] categories = {"Food", "Drink", "Dessert"};
-    private int[] categoryIds = {1, 2, 3}; // You can load this from API if needed
+    private byte[] imageData;
+    private String imageMimeType;
+
+    private int[] categoryIds;
+
+    private final MenuRepository menuRepository = new MenuRepository();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,25 +57,83 @@ public class CreateMenuActivity extends Activity {
         spinnerCategory = findViewById(R.id.spinnerCategory);
         checkIsAvailable = findViewById(R.id.checkIsAvailable);
         imgPreview = findViewById(R.id.imgPreview);
-        Button btnChooseImage = findViewById(R.id.btnChooseImage);
-        Button btnSave = findViewById(R.id.btnSave);
+        btnChooseImage = findViewById(R.id.btnChooseImage);
+        btnSave = findViewById(R.id.btnSave);
         Button btnCancel = findViewById(R.id.btnCancel);
+        loadCategories();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategory.setAdapter(adapter);
+        btnChooseImage.setOnClickListener(v -> openImageChooser());
 
+        btnSave.setOnClickListener(v -> saveMenu());
 
         btnCancel.setOnClickListener(v -> {
             finish();
         });
+    }
 
-        btnChooseImage.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    private void loadCategories() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        apiService.getAllCategories().enqueue(new Callback<List<Category>>() {
+            @Override
+            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Category> categories = response.body();
+                    String[] categoryNames = new String[categories.size()];
+                    categoryIds = new int[categories.size()];
+
+                    for (int i = 0; i < categories.size(); i++) {
+                        categoryNames[i] = categories.get(i).getCategoryName();
+                        categoryIds[i] = categories.get(i).getCategoryId();
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            CreateMenuActivity.this,
+                            android.R.layout.simple_spinner_item,
+                            categoryNames);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerCategory.setAdapter(adapter);
+                } else {
+                    Toast.makeText(CreateMenuActivity.this, "Failed to load categories", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Category>> call, Throwable t) {
+                Toast.makeText(CreateMenuActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
+    }
 
-        btnSave.setOnClickListener(v -> saveMenu());
+    private void openImageChooser() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            Uri selectedImage = data.getData();
+            imgPreview.setImageURI(selectedImage);
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                imageData = stream.toByteArray();
+
+                String path = getRealPath(this, selectedImage);
+                imageMimeType = getContentResolver().getType(selectedImage);
+                if (imageMimeType == null) {
+                    imageMimeType = "image/jpeg"; // fallback
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void saveMenu() {
@@ -74,77 +142,55 @@ public class CreateMenuActivity extends Activity {
         String priceText = etPrice.getText().toString().trim();
         boolean isAvailable = checkIsAvailable.isChecked();
 
-        if (name.isEmpty() || priceText.isEmpty() || imageData == null || imageMimeType == null) {
-            Toast.makeText(this, "Please fill all fields and select an image", Toast.LENGTH_SHORT).show();
+        if (name.isEmpty() || description.isEmpty() || priceText.isEmpty() || imageData == null) {
+            Toast.makeText(this, "Please fill in all fields and select an image", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        double price = Double.parseDouble(priceText);
-        int selectedCategoryId = categoryIds[spinnerCategory.getSelectedItemPosition()];
+        double price;
+        try {
+            price = Double.parseDouble(priceText);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid price", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int categoryId = categoryIds[spinnerCategory.getSelectedItemPosition()];
 
         Menu menu = new Menu();
         menu.setName(name);
         menu.setDescription(description);
         menu.setPrice(price);
-        menu.setCategoryId(selectedCategoryId);
         menu.setAvailable(isAvailable);
-        menu.setImageData(imageData);
-        menu.setImageMimeType(imageMimeType);
+        menu.setCategoryId(categoryId);
 
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<Menu> call = apiService.createMenu(menu);
-
-        call.enqueue(new Callback<Menu>() {
+        menuRepository.createMenu(menu, imageData, imageMimeType, new MenuRepository.SimpleCallback() {
             @Override
-            public void onResponse(Call<Menu> call, Response<Menu> response) {
-                if (response.isSuccessful()) {
+            public void onSuccess() {
+                runOnUiThread(() -> {
                     Toast.makeText(CreateMenuActivity.this, "Menu created successfully", Toast.LENGTH_SHORT).show();
-                    finish(); // go back
-                } else {
-                    Toast.makeText(CreateMenuActivity.this, "Failed: " + response.code(), Toast.LENGTH_SHORT).show();
-                }
+                    finish();
+                });
             }
 
             @Override
-            public void onFailure(Call<Menu> call, Throwable t) {
-                Toast.makeText(CreateMenuActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onError(String message) {
+                runOnUiThread(
+                        () -> Toast.makeText(CreateMenuActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show());
             }
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri imageUri = data.getData();
-
-            // Show preview using Glide (on UI thread)
-            Glide.with(this)
-                    .load(imageUri)
-                    .override(512, 512) // Optional: downscale for preview only
-                    .centerCrop()
-                    .into(imgPreview);
-
-            // Load actual byte[] for upload in background
-            new Thread(() -> {
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                    Bitmap resized = Bitmap.createScaledBitmap(bitmap, 512, 512, true); // Optional downscale
-                    imageData = bitmapToByteArray(resized);
-                    imageMimeType = getContentResolver().getType(imageUri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    runOnUiThread(() -> Toast.makeText(this, "Image load failed", Toast.LENGTH_SHORT).show());
-                }
-            }).start();
+    public static String getRealPath(Context context, Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            String path = cursor.getString(column_index);
+            cursor.close();
+            return path;
         }
-    }
-
-
-    private byte[] bitmapToByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream); // you can change to JPEG
-        return stream.toByteArray();
+        return null;
     }
 }

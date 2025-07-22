@@ -8,49 +8,101 @@ public class Menu {
     private int categoryId;
     private String categoryName;
     private boolean isAvailable;
-    private byte[] imageData;
+    private transient byte[] imageData;
     private String imageMimeType;
-
-    public static final String CREATE_TABLE =
-            "CREATE TABLE IF NOT EXISTS Menu (" +
-                    "menuId INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT NOT NULL, " +
-                    "description TEXT, " +
-                    "price REAL NOT NULL, " +
-                    "categoryId INTEGER, " +
-                    "categoryName TEXT, " +
-                    "isAvailable INTEGER, " +
-                    "imageData BLOB, " +
-                    "imageMimeType TEXT" +
-                    ")";
+    private String imageDataBase64;
+    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS Menu (" +
+            "menuId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "name TEXT NOT NULL, " +
+            "description TEXT, " +
+            "price REAL NOT NULL, " +
+            "categoryId INTEGER, " +
+            "categoryName TEXT, " +
+            "isAvailable INTEGER, " +
+            "imageData BLOB, " +
+            "imageMimeType TEXT" +
+            ")";
 
     // Getters and Setters
-    public int getMenuId() { return menuId; }
-    public void setMenuId(int menuId) { this.menuId = menuId; }
+    public int getMenuId() {
+        return menuId;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setMenuId(int menuId) {
+        this.menuId = menuId;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getName() {
+        return name;
+    }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public int getCategoryId() { return categoryId; }
-    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+    public String getDescription() {
+        return description;
+    }
 
-    public String getCategoryName() { return categoryName; }
-    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public boolean isAvailable() { return isAvailable; }
-    public void setAvailable(boolean available) { isAvailable = available; }
+    public double getPrice() {
+        return price;
+    }
 
-    public byte[] getImageData() { return imageData; }
-    public void setImageData(byte[] imageData) { this.imageData = imageData; }
+    public void setPrice(double price) {
+        this.price = price;
+    }
 
-    public String getImageMimeType() { return imageMimeType; }
-    public void setImageMimeType(String imageMimeType) { this.imageMimeType = imageMimeType; }
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
+
+    public String getImageMimeType() {
+        return imageMimeType;
+    }
+
+    public void setImageMimeType(String imageMimeType) {
+        this.imageMimeType = imageMimeType;
+    }
+
+    public String getImageDataBase64() {
+        return imageDataBase64;
+    }
+
+    public void setImageDataBase64(String imageDataBase64) {
+        this.imageDataBase64 = imageDataBase64;
+    }
 
     @Override
     public String toString() {
@@ -79,8 +131,10 @@ public class Menu {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
         Menu menu = (Menu) obj;
         return this.getMenuId() == menu.getMenuId();
     }
