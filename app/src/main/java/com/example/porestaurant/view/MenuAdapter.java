@@ -1,6 +1,7 @@
 package com.example.porestaurant.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,8 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import com.example.porestaurant.R;
 import com.example.porestaurant.model.Menu;
 
@@ -58,12 +58,13 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
         byte[] imageData = menu.getImageData();
         if (imageData != null && imageData.length > 0) {
-            holder.ivMenuImage.setImageBitmap(
-                    BitmapFactory.decodeByteArray(imageData, 0,imageData.length));
+            Bitmap bmp = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+            holder.ivMenuImage.setImageBitmap(bmp);
         } else {
             holder.ivMenuImage.setImageResource(R.drawable.no_image);
         }
     }
+
 
     @Override
     public int getItemCount() {

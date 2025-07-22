@@ -29,8 +29,10 @@
             android:name=".ui.theme.AdminDashboardActivity"
             android:exported="true"
             android:label="Admin Dashboard">
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <!-- <intent-filter> -->
+<!--                <action android:name="android.intent.action.MAIN"/>-->
+<!--                <category android:name="android.intent.category.LAUNCHER"/>-->
+<!--            </intent-filter>-->
         </activity>
 
         <!-- Nếu bạn không muốn AdminDashboard là launcher,
@@ -52,6 +54,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
         </activity>
         <activity android:name=".view.ActivityProfile" />
         <activity android:name=".view.RegisterActivity" />

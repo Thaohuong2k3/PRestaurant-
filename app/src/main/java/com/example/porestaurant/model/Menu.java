@@ -1,5 +1,7 @@
 package com.example.porestaurant.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Menu {
     private int menuId;
     private String name;
@@ -8,94 +10,52 @@ public class Menu {
     private int categoryId;
     private String categoryName;
     private boolean isAvailable;
+
     private transient byte[] imageData;
+    @SerializedName("imageMimeType")
     private String imageMimeType;
+    @SerializedName("imageData")
     private String imageDataBase64;
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS Menu (" +
-            "menuId INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            "name TEXT NOT NULL, " +
-            "description TEXT, " +
-            "price REAL NOT NULL, " +
-            "categoryId INTEGER, " +
-            "categoryName TEXT, " +
-            "isAvailable INTEGER, " +
-            "imageData BLOB, " +
-            "imageMimeType TEXT" +
-            ")";
+    public static final String CREATE_TABLE =
+            "CREATE TABLE IF NOT EXISTS Menu (" +
+                    "menuId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT NOT NULL, " +
+                    "description TEXT, " +
+                    "price REAL NOT NULL, " +
+                    "categoryId INTEGER, " +
+                    "categoryName TEXT, " +
+                    "isAvailable INTEGER, " +
+                    "imageData BLOB, " +
+                    "imageMimeType TEXT" +
+                    ")";
 
     // Getters and Setters
-    public int getMenuId() {
-        return menuId;
-    }
+    public int getMenuId() { return menuId; }
+    public void setMenuId(int menuId) { this.menuId = menuId; }
 
-    public void setMenuId(int menuId) {
-        this.menuId = menuId;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
-    public String getDescription() {
-        return description;
-    }
+    public int getCategoryId() { return categoryId; }
+    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getCategoryName() { return categoryName; }
+    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 
-    public double getPrice() {
-        return price;
-    }
+    public boolean isAvailable() { return isAvailable; }
+    public void setAvailable(boolean available) { isAvailable = available; }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
+    public byte[] getImageData() { return imageData; }
+    public void setImageData(byte[] imageData) { this.imageData = imageData; }
 
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
-    }
-
-    public void setAvailable(boolean available) {
-        isAvailable = available;
-    }
-
-    public byte[] getImageData() {
-        return imageData;
-    }
-
-    public void setImageData(byte[] imageData) {
-        this.imageData = imageData;
-    }
-
-    public String getImageMimeType() {
-        return imageMimeType;
-    }
-
-    public void setImageMimeType(String imageMimeType) {
-        this.imageMimeType = imageMimeType;
-    }
-
+    public String getImageMimeType() { return imageMimeType; }
+    public void setImageMimeType(String imageMimeType) { this.imageMimeType = imageMimeType; }
     public String getImageDataBase64() {
         return imageDataBase64;
     }
@@ -131,10 +91,8 @@ public class Menu {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
         Menu menu = (Menu) obj;
         return this.getMenuId() == menu.getMenuId();
     }

@@ -28,20 +28,19 @@ public class MenuRepository {
             public void onResponse(Call<List<Menu>> call, Response<List<Menu>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Menu> menuList = response.body();
-
+                    // decode ảnh Base64 nếu có
                     for (Menu menu : menuList) {
                         String base64 = menu.getImageDataBase64();
                         if (base64 != null && !base64.isEmpty()) {
                             try {
-                                byte[] decodedBytes = Base64.decode(base64, Base64.DEFAULT);
-                                menu.setImageData(decodedBytes);
+                                byte[] decoded = Base64.decode(base64, Base64.DEFAULT);
+                                menu.setImageData(decoded);
                             } catch (IllegalArgumentException e) {
-                                callback.onError("Failed to decode image for menu: " + e.getMessage());
+                                callback.onError("Không giải mã được ảnh: " + e.getMessage());
                                 return;
                             }
                         }
                     }
-
                     callback.onSuccess(menuList);
                 } else {
                     callback.onError("Failed to load menus. Code: " + response.code());
@@ -62,7 +61,7 @@ public class MenuRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
-                    callback.onError("Menu not found.");
+                    callback.onError("Menu not found. Code: " + response.code());
                 }
             }
 
@@ -74,60 +73,75 @@ public class MenuRepository {
     }
 
     public void createMenu(Menu menu, byte[] imageData, String imageMimeType, final SimpleCallback callback) {
-        // Convert fields to RequestBody
         RequestBody name = RequestBody.create(MediaType.parse("text/plain"), menu.getName());
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), menu.getDescription());
         RequestBody price = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(menu.getPrice()));
-        RequestBody categoryId = RequestBody.create(MediaType.parse("text/plain"),
-                String.valueOf(menu.getCategoryId()));
+        RequestBody categoryId = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(menu.getCategoryId()));
         RequestBody isAvailable = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(menu.isAvailable()));
 
         MultipartBody.Part imagePart;
-
         if (imageData != null && imageData.length > 0) {
-            RequestBody requestFile = RequestBody.create(MediaType.parse(imageMimeType), imageData);
-            imagePart = MultipartBody.Part.createFormData("imageFile", "image.jpg", requestFile);
+            RequestBody file = RequestBody.create(MediaType.parse(imageMimeType), imageData);
+            imagePart = MultipartBody.Part.createFormData("imageFile", "image.jpg", file);
         } else {
-            // Still send empty part to avoid server-side null error
-            RequestBody emptyFile = RequestBody.create(MediaType.parse("application/octet-stream"), new byte[0]);
-            imagePart = MultipartBody.Part.createFormData("imageFile", "", emptyFile);
+            // gửi phần rỗng nếu không có ảnh để tránh lỗi server
+            RequestBody empty = RequestBody.create(MediaType.parse("application/octet-stream"), new byte[0]);
+            imagePart = MultipartBody.Part.createFormData("imageFile", "", empty);
         }
 
-        // Call API with corrected parameter order
         apiService.createMenu(name, description, price, categoryId, isAvailable, imagePart)
+                  .enqueue(new Callback<Menu>() {
+            @Override
+            public void onResponse(Call<Menu> call, Response<Menu> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    callback.onError("Create failed. Code: " + response.code());
+                }
+            }
+            @Override
+            public void onFailure(Call<Menu> call, Throwable t) {
+                callback.onError("Connection error: " + t.getMessage());
+            }
+        });
+    }
+
+    public void updateMenu(int id,
+                           Menu m,
+                           byte[] imgData,
+                           String mimeType,
+                           final SimpleCallback callback) {
+        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), m.getName());
+        RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), m.getDescription());
+        RequestBody price = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(m.getPrice()));
+        RequestBody catId = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(m.getCategoryId()));
+        RequestBody avail = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(m.isAvailable()));
+
+        // Biên dịch phần image
+        MultipartBody.Part imagePart;
+        if (imgData != null && imgData.length > 0 && mimeType != null) {
+            RequestBody file = RequestBody.create(MediaType.parse(mimeType), imgData);
+            imagePart = MultipartBody.Part.createFormData("imageFile", "upload.jpg", file);
+        } else {
+            RequestBody empty = RequestBody.create(MediaType.parse("application/octet-stream"), new byte[0]);
+            imagePart = MultipartBody.Part.createFormData("imageFile", "", empty);
+        }
+
+        apiService.updateMenu(id, name, desc, price, catId, avail, imagePart)
                 .enqueue(new Callback<Menu>() {
                     @Override
                     public void onResponse(Call<Menu> call, Response<Menu> response) {
                         if (response.isSuccessful()) {
                             callback.onSuccess();
                         } else {
-                            callback.onError("Create failed. Status: " + response.code());
+                            callback.onError("Update failed. Code: " + response.code());
                         }
                     }
-
                     @Override
                     public void onFailure(Call<Menu> call, Throwable t) {
                         callback.onError("Connection error: " + t.getMessage());
                     }
                 });
-    }
-
-    public void updateMenu(int id, Menu menu, final SimpleCallback callback) {
-        apiService.updateMenu(id, menu).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess();
-                } else {
-                    callback.onError("Update failed.");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                callback.onError("Connection error: " + t.getMessage());
-            }
-        });
     }
 
     public void deleteMenu(int id, final SimpleCallback callback) {
@@ -137,10 +151,9 @@ public class MenuRepository {
                 if (response.isSuccessful()) {
                     callback.onSuccess();
                 } else {
-                    callback.onError("Delete failed.");
+                    callback.onError("Delete failed. Code: " + response.code());
                 }
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 callback.onError("Connection error: " + t.getMessage());
@@ -148,23 +161,19 @@ public class MenuRepository {
         });
     }
 
-    // Callback interfaces
+    // Các interface callback
     public interface MenuCallback {
         void onSuccess(List<Menu> menuList);
-
         void onError(String error);
     }
 
     public interface SingleMenuCallback {
         void onSuccess(Menu menu);
-
         void onError(String error);
     }
 
     public interface SimpleCallback {
         void onSuccess();
-
         void onError(String error);
     }
-
 }
