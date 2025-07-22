@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar_layout"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="@color/surface_primary"
+    android:elevation="4dp">
+
+    <!-- Hamburger Menu -->
+    <ImageView
+        android:id="@+id/iv_hamburger"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_menu"
+        android:contentDescription="Menu"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:padding="4dp"
+        app:tint="@color/text_primary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- PlayTech Title -->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="PO Restaurant"
+        android:textColor="@color/text_primary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/iv_hamburger"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Search Icon -->
+    <ImageView
+        android:id="@+id/iv_search"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_search"
+        android:contentDescription="Search"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:padding="4dp"
+        app:tint="@color/text_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+<!--    &lt;!&ndash; Filter Icon &ndash;&gt;-->
+<!--    <ImageView-->
+<!--        android:id="@+id/iv_filter"-->
+<!--        android:layout_width="24dp"-->
+<!--        android:layout_height="24dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:src="@drawable/ic_filter"-->
+<!--        android:contentDescription="Filter"-->
+<!--        android:background="?android:attr/selectableItemBackgroundBorderless"-->
+<!--        android:padding="4dp"-->
+<!--        app:tint="@color/text_primary"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent" />-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

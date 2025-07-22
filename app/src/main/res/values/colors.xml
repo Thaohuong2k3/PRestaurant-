@@ -5,6 +5,66 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="status_in_progress">#288BCB</color>
+    <color name="status_done">#4CAF50</color>
+    <color name="status_not_started">#9E9E9E</color>
+    <color name="status_overdue">#E9CC16</color>
+    <color name="status_default">#CCCCCC</color>
+
+    <!-- Primary Colors -->
+    <color name="primary_color">#6200EE</color>
+    <color name="primary_color_dark">#3700B3</color>
+    <color name="accent_color">#03DAC5</color>
+
+    <!-- Text Colors -->
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="white_text">#FFFFFF</color>
+
+    <!-- Background Colors -->
+    <color name="background_color">#FFFFFF</color>
+    <color name="surface_color">#F5F5F5</color>
+    <color name="divider_color">#E0E0E0</color>
+
+    <!-- Status Colors -->
+    <color name="error_color">#B00020</color>
+    <color name="success_color">#4CAF50</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradient_start">#667EEA</color>
+    <color name="gradient_end">#764BA2</color>
+
+    <!-- Primary Colors -->
+    <color name="background_primary">#FFFFFF</color>
+    <color name="surface_primary">#F5F5F5</color>
+    <color name="surface_secondary">#E0E0E0</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_primary">#00E5FF</color>
+    <color name="accent_secondary">#FFD700</color>
+    <color name="accent_danger">#FF4444</color>
+    <color name="accent_success">#00C853</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_tertiary">#9E9E9E</color>
+
+    <!-- Gaming Theme Colors -->
+    <color name="gaming_purple">#8B5CF6</color>
+    <color name="gaming_pink">#EC4899</color>
+    <color name="gaming_orange">#F59E0B</color>
+    <color name="gaming_green">#10B981</color>
+
+    <!-- System Colors -->
+    <color name="transparent">#00000000</color>
+
+    <!-- Status Bar -->
+    <color name="status_bar">#F5F5F5</color>
+
+    <!-- Ripple Effect -->
+    <color name="ripple_color">#33000000</color>
 </resources>

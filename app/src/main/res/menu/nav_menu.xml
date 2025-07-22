@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_profile"
+        android:title="User Profile" />
+    <item
+        android:id="@+id/nav_menu"
+        android:icon="@drawable/ic_home"
+        android:title="Menu" />
+    <item
+        android:id="@+id/nav_table"
+        android:icon="@drawable/ic_create"
+        android:title="Table" />
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_login"
+        android:title="Logout" />
+</menu>
