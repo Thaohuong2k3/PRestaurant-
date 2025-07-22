@@ -55,7 +55,6 @@ public class MenuRepository {
         });
     }
 
-
     public void getMenuById(int id, final SingleMenuCallback callback) {
         apiService.getMenuById(id).enqueue(new Callback<Menu>() {
             @Override
@@ -79,7 +78,8 @@ public class MenuRepository {
         RequestBody name = RequestBody.create(MediaType.parse("text/plain"), menu.getName());
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), menu.getDescription());
         RequestBody price = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(menu.getPrice()));
-        RequestBody categoryId = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(menu.getCategoryId()));
+        RequestBody categoryId = RequestBody.create(MediaType.parse("text/plain"),
+                String.valueOf(menu.getCategoryId()));
         RequestBody isAvailable = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(menu.isAvailable()));
 
         MultipartBody.Part imagePart;
@@ -111,7 +111,6 @@ public class MenuRepository {
                     }
                 });
     }
-
 
     public void updateMenu(int id, Menu menu, final SimpleCallback callback) {
         apiService.updateMenu(id, menu).enqueue(new Callback<Void>() {
@@ -152,16 +151,19 @@ public class MenuRepository {
     // Callback interfaces
     public interface MenuCallback {
         void onSuccess(List<Menu> menuList);
+
         void onError(String error);
     }
 
     public interface SingleMenuCallback {
         void onSuccess(Menu menu);
+
         void onError(String error);
     }
 
     public interface SimpleCallback {
         void onSuccess();
+
         void onError(String error);
     }
 

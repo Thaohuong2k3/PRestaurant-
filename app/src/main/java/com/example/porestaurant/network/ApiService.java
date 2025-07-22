@@ -13,6 +13,12 @@ import com.example.porestaurant.model.TableDTO;
 import com.example.porestaurant.model.TableBookingRequest;
 import com.example.porestaurant.model.TableStatusUpdateRequest;
 import com.example.porestaurant.model.VerifyOtpRequest;
+import com.example.porestaurant.model.Admin.MenuDTO;
+import com.example.porestaurant.model.Admin.TableDTO;
+import com.example.porestaurant.model.Admin.TableBookingRequest;
+import com.example.porestaurant.model.Admin.TableStatusUpdateRequest;
+import com.example.porestaurant.model.Admin;
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -116,4 +122,31 @@ public interface ApiService {
                         @Query("origin") String origin,
                         @Query("destination") String destination,
                         @Query("key") String apiKey);
+
+        // --- Admin Statistical Endpoints ---
+        @GET("admin/statistical/RevenueByMonth/{year}")
+        Call<List<Admin.RevenueByMonthDto>> getRevenueByMonth(@Path("year") int year);
+
+        @GET("admin/statistical/OrderCountByMonth/{year}")
+        Call<List<Admin.OrderCountByMonthDto>> getOrderCountByMonth(@Path("year") int year);
+
+        @GET("admin/statistical/TopMenuItems")
+        Call<List<Admin.TopMenuItemDto>> getTopMenuItems(
+                        @Query("topN") int topN,
+                        @Query("from") String from, // "yyyy-MM-dd"
+                        @Query("to") String to);
+
+        @GET("admin/statistical/TableOccupancy")
+        Call<List<Admin.TableOccupancyDto>> getTableOccupancy(@Query("date") String date);
+
+        @GET("admin/statistical/PaymentMethods")
+        Call<List<Admin.PaymentMethodDto>> getPaymentMethods(
+                        @Query("from") String from,
+                        @Query("to") String to);
+
+        @GET("admin/statistical/CustomerCountByMonth/{year}")
+        Call<List<Admin.CustomerCountByMonthDto>> getCustomerCountByMonth(@Path("year") int year);
+
+        @GET("admin/statistical/MenuStats/{year}")
+        Call<Admin.MenuStatsDto> getMenuStats(@Path("year") int year);
 }
