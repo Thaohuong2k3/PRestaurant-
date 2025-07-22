@@ -1,4 +1,4 @@
-package com.example.porestaurant.ui.theme;
+package com.example.porestaurant.view;
 
 import android.graphics.Color;  // thêm import này
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package com.example.porestaurant.ui.theme;
+package com.example.porestaurant.view;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

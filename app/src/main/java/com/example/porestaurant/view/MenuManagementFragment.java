@@ -1,5 +1,5 @@
 // app/src/main/java/com/example/porestaurant/ui/theme/MenuManagementFragment.java
-package com.example.porestaurant.ui.theme;
+package com.example.porestaurant.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;

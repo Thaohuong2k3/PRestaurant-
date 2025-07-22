@@ -15,7 +15,7 @@
 
         <!-- Launcher Activity -->
         <activity
-            android:name=".ui.theme.AdminDashboardActivity"
+            android:name=".view.AdminDashboardActivity"
             android:exported="true"
             android:label="Admin Dashboard">
             <intent-filter>

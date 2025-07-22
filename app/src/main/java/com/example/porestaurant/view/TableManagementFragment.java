@@ -1,5 +1,5 @@
 // app/src/main/java/com/example/porestaurant/ui/theme/TableManagementFragment.java
-package com.example.porestaurant.ui.theme;
+package com.example.porestaurant.view;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
