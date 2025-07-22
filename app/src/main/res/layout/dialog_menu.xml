@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/ivPreview"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btnChooseImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn ảnh..."
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/etMenuName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tên món"/>
+
+        <EditText
+            android:id="@+id/etMenuPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Giá"
+            android:inputType="numberDecimal"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Mô tả món -->
+        <EditText
+            android:id="@+id/etMenuDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mô tả"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:gravity="top"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Danh mục -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chọn danh mục"
+            android:layout_marginTop="8dp"/>
+        <Spinner
+            android:id="@+id/spMenuCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Tình trạng còn hàng -->
+        <CheckBox
+            android:id="@+id/cbMenuAvailable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Còn hàng"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+</ScrollView>

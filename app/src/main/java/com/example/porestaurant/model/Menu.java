@@ -1,5 +1,7 @@
 package com.example.porestaurant.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Menu {
     private int menuId;
     private String name;
@@ -8,9 +10,12 @@ public class Menu {
     private int categoryId;
     private String categoryName;
     private boolean isAvailable;
-    private String image;
 
-
+    private transient byte[] imageData;
+    @SerializedName("imageMimeType")
+    private String imageMimeType;
+    @SerializedName("imageData")
+    private String imageDataBase64;
     public static final String CREATE_TABLE =
             "CREATE TABLE IF NOT EXISTS Menu (" +
                     "menuId INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -19,8 +24,9 @@ public class Menu {
                     "price REAL NOT NULL, " +
                     "categoryId INTEGER, " +
                     "categoryName TEXT, " +
-                    "isAvailable INTEGER" +
-                    "image TEXT"  +
+                    "isAvailable INTEGER, " +
+                    "imageData BLOB, " +
+                    "imageMimeType TEXT" +
                     ")";
 
     // Getters and Setters
@@ -45,24 +51,54 @@ public class Menu {
     public boolean isAvailable() { return isAvailable; }
     public void setAvailable(boolean available) { isAvailable = available; }
 
-    public String getImage() {
-        return image;
+    public byte[] getImageData() { return imageData; }
+    public void setImageData(byte[] imageData) { this.imageData = imageData; }
+
+    public String getImageMimeType() { return imageMimeType; }
+    public void setImageMimeType(String imageMimeType) { this.imageMimeType = imageMimeType; }
+    public String getImageDataBase64() {
+        return imageDataBase64;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageDataBase64(String imageDataBase64) {
+        this.imageDataBase64 = imageDataBase64;
     }
 
     @Override
     public String toString() {
         return "Menu{" +
-                "id=" + menuId +
+                "menuId=" + menuId +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", categoryId=" + categoryId +
-                ", image='" + image + '\'' +
+                ", categoryName='" + categoryName + '\'' +
                 ", isAvailable=" + isAvailable +
+                ", imageMimeType='" + imageMimeType + '\'' +
+                ", imageData=" + (imageData != null ? imageData.length + " bytes" : "null") +
                 '}';
+    }
+
+    private int quantity = 1;
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Menu menu = (Menu) obj;
+        return this.getMenuId() == menu.getMenuId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.valueOf(menuId).hashCode();
     }
 }

@@ -1,167 +1,178 @@
 package com.example.porestaurant.view;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.porestaurant.R;
 import com.example.porestaurant.model.Menu;
+import com.example.porestaurant.model.CartStorage;
+import com.example.porestaurant.repository.CategoryRepository;
 import com.example.porestaurant.repository.MenuRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MenuActivity extends AppCompatActivity {
 
-    EditText edtId, edtName, edtDesc, edtPrice, edtCategoryId, edtImage;
-    Button btnCreate, btnGetAll, btnGetById, btnUpdate, btnDelete;
-    TextView txtResult;
-    MenuRepository menuRepo;
+    private RecyclerView recyclerViewMenu;
+    private RecyclerView recyclerViewCategory;
+    private MenuAdapter menuAdapter;
+    private CategoryAdapter categoryAdapter;
+    private Button btnCart;
+    private SearchView searchViewMenu;
+
+    private List<Menu> allMenus = new ArrayList<>();
+    private String selectedCategory = "All"; // Track selected category
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        // Initialize views
-        edtId = findViewById(R.id.edtId);
-        edtName = findViewById(R.id.edtName);
-        edtDesc = findViewById(R.id.edtDescription);
-        edtPrice = findViewById(R.id.edtPrice);
-        edtCategoryId = findViewById(R.id.edtCategoryId);
-        edtImage = findViewById(R.id.edtImage);
-        txtResult = findViewById(R.id.txtResult);
+        recyclerViewMenu = findViewById(R.id.recyclerMenu);
+        recyclerViewMenu.setLayoutManager(new LinearLayoutManager(this));
 
-        btnCreate = findViewById(R.id.btnCreate);
-        btnGetAll = findViewById(R.id.btnGetAll);
-        btnGetById = findViewById(R.id.btnGetById);
-        btnUpdate = findViewById(R.id.btnUpdate);
-        btnDelete = findViewById(R.id.btnDelete);
+        recyclerViewCategory = findViewById(R.id.recyclerCategory);
+        recyclerViewCategory.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        );
 
-        menuRepo = new MenuRepository();
-
-        btnCreate.setOnClickListener(v -> createMenu());
-        btnGetAll.setOnClickListener(v -> getAllMenus());
-        btnGetById.setOnClickListener(v -> getMenuById());
-        btnUpdate.setOnClickListener(v -> updateMenu());
-        btnDelete.setOnClickListener(v -> deleteMenu());
-    }
-
-    private void createMenu() {
-        Menu menu = collectMenuInput();
-        if (menu == null) return;
-
-        menuRepo.createMenu(menu, new MenuRepository.SimpleCallback() {
+        searchViewMenu = findViewById(R.id.searchViewMenu);
+        searchViewMenu.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onSuccess() {
-                runOnUiThread(() -> txtResult.setText("Created"));
+            public boolean onQueryTextSubmit(String query) {
+                return false; // Not using submit
             }
 
             @Override
-            public void onError(String error) {
-                runOnUiThread(() -> txtResult.setText(error));
+            public boolean onQueryTextChange(String newText) {
+                filterMenus();
+                return true;
             }
         });
+
+        Button btnCreateMenu = findViewById(R.id.btnCreateMenu);
+        btnCart = findViewById(R.id.btnCart);
+
+        btnCart.setOnClickListener(v -> {
+            Intent intent = new Intent(MenuActivity.this, CartActivity.class);
+            startActivity(intent);
+        });
+
+        btnCreateMenu.setOnClickListener(v -> {
+            Intent intent = new Intent(MenuActivity.this, CreateMenuActivity.class);
+            startActivity(intent);
+        });
+
+        loadMenus();
     }
 
-    private void getAllMenus() {
-        menuRepo.getAllMenus(new MenuRepository.MenuCallback() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadMenus();
+        updateCartCount(); // update when returning
+    }
+
+    private void loadMenus() {
+        MenuRepository repository = new MenuRepository();
+
+        repository.getAllMenus(new MenuRepository.MenuCallback() {
             @Override
             public void onSuccess(List<Menu> menuList) {
-                runOnUiThread(() -> txtResult.setText(menuList.toString()));
+                runOnUiThread(() -> {
+                    allMenus = menuList;
+
+                    // Setup menu list
+                    menuAdapter = new MenuAdapter(MenuActivity.this, menuList, menu -> {
+                        CartStorage.addToCart(MenuActivity.this, menu);
+                        updateCartCount();
+                        Toast.makeText(MenuActivity.this, "Added to cart: " + menu.getName(), Toast.LENGTH_SHORT).show();
+                    });
+                    recyclerViewMenu.setAdapter(menuAdapter);
+
+                    // Load categories from API
+                    loadCategoriesFromApi();
+                });
             }
 
             @Override
-            public void onError(String error) {
-                runOnUiThread(() -> txtResult.setText(error));
+            public void onError(String errorMessage) {
+                runOnUiThread(() -> {
+                    Toast.makeText(MenuActivity.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    Log.e("MenuActivity", "loadMenus: " + errorMessage);
+                });
             }
         });
     }
 
-    private void getMenuById() {
-        try {
-            int id = Integer.parseInt(edtId.getText().toString());
-            menuRepo.getMenuById(id, new MenuRepository.SingleMenuCallback() {
-                @Override
-                public void onSuccess(Menu menu) {
-                    runOnUiThread(() -> txtResult.setText(menu.toString()));
-                }
+    private void loadCategoriesFromApi() {
+        CategoryRepository categoryRepository = new CategoryRepository();
+        categoryRepository.getAllCategories(new CategoryRepository.CategoryCallback() {
+            @Override
+            public void onSuccess(List<com.example.porestaurant.model.Category> categoryList) {
+                runOnUiThread(() -> {
+                    List<String> categories = new ArrayList<>();
+                    categories.add("All"); // default
 
-                @Override
-                public void onError(String error) {
-                    runOnUiThread(() -> txtResult.setText(error));
-                }
-            });
+                    for (com.example.porestaurant.model.Category cat : categoryList) {
+                        if (cat.getCategoryName() != null) {
+                            categories.add(cat.getCategoryName());
+                        }
+                    }
 
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid ID", Toast.LENGTH_SHORT).show();
-        }
+                    categoryAdapter = new CategoryAdapter(categories, selected -> {
+                        selectedCategory = selected;
+                        filterMenus();
+                    });
+
+                    recyclerViewCategory.setAdapter(categoryAdapter);
+                });
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                runOnUiThread(() -> Toast.makeText(MenuActivity.this, "Category load failed: " + errorMessage, Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
-    private void updateMenu() {
-        try {
-            int id = Integer.parseInt(edtId.getText().toString());
-            Menu menu = collectMenuInput();
-            if (menu == null) return;
+    private void filterMenus() {
+        String searchQuery = searchViewMenu.getQuery().toString().toLowerCase().trim();
+        List<Menu> filtered = new ArrayList<>();
 
-            menuRepo.updateMenu(id, menu, new MenuRepository.SimpleCallback() {
-                @Override
-                public void onSuccess() {
-                    runOnUiThread(() -> txtResult.setText("Updated"));
-                }
+        for (Menu m : allMenus) {
+            boolean matchesCategory = selectedCategory.equals("All") ||
+                    (m.getCategoryName() != null && selectedCategory.equals(m.getCategoryName()));
+            boolean matchesSearch = m.getName().toLowerCase().contains(searchQuery);
 
-                @Override
-                public void onError(String error) {
-                    runOnUiThread(() -> txtResult.setText(error));
-                }
-            });
-
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid ID", Toast.LENGTH_SHORT).show();
+            if (matchesCategory && matchesSearch) {
+                filtered.add(m);
+            }
         }
+
+        menuAdapter.updateList(filtered);
     }
 
-    private void deleteMenu() {
-        try {
-            int id = Integer.parseInt(edtId.getText().toString());
-            menuRepo.deleteMenu(id, new MenuRepository.SimpleCallback() {
-                @Override
-                public void onSuccess() {
-                    runOnUiThread(() -> txtResult.setText("Deleted"));
-                }
-
-                @Override
-                public void onError(String error) {
-                    runOnUiThread(() -> txtResult.setText(error));
-                }
-            });
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid ID", Toast.LENGTH_SHORT).show();
+    private void updateCartCount() {
+        List<Menu> cart = CartStorage.getCart(this);
+        int count = 0;
+        for (Menu item : cart) {
+            count += item.getQuantity();
         }
+        btnCart.setText("Cart (" + count + ")");
     }
 
-    private Menu collectMenuInput() {
-        try {
-            String name = edtName.getText().toString();
-            String desc = edtDesc.getText().toString();
-            double price = Double.parseDouble(edtPrice.getText().toString());
-            int categoryId = Integer.parseInt(edtCategoryId.getText().toString());
-            String image = edtImage.getText().toString();
-
-            Menu menu = new Menu();
-            menu.setName(name);
-            menu.setDescription(desc);
-            menu.setPrice(price);
-            menu.setCategoryId(categoryId);
-            menu.setImage(image);
-
-            return menu;
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show();
-            return null;
-        }
+    public void updateList(List<Menu> newList) {
+        allMenus = newList;
+        menuAdapter.notifyDataSetChanged();
     }
 }
