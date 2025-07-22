@@ -1,9 +1,10 @@
 package com.example.porestaurant.view;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import com.example.porestaurant.R;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.porestaurant.R;
 
 public class MainActivity extends AppCompatActivity {
     private Button btnOpenMap;
@@ -25,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, MenuActivity.class));
         });
 
-        Button btnGoToBooking = findViewById(R.id.btn_go_to_booking); // Thêm button trong activity_main.xml
+        Button btnGoToBooking = findViewById(R.id.btn_go_to_booking);
+
         btnGoToBooking.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, BookingActivity.class));
         });

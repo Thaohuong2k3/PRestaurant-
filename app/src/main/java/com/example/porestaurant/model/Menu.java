@@ -8,8 +8,8 @@ public class Menu {
     private int categoryId;
     private String categoryName;
     private boolean isAvailable;
-    private String image;
-
+    private byte[] imageData;
+    private String imageMimeType;
 
     public static final String CREATE_TABLE =
             "CREATE TABLE IF NOT EXISTS Menu (" +
@@ -19,8 +19,9 @@ public class Menu {
                     "price REAL NOT NULL, " +
                     "categoryId INTEGER, " +
                     "categoryName TEXT, " +
-                    "isAvailable INTEGER" +
-                    "image TEXT"  +
+                    "isAvailable INTEGER, " +
+                    "imageData BLOB, " +
+                    "imageMimeType TEXT" +
                     ")";
 
     // Getters and Setters
@@ -45,24 +46,47 @@ public class Menu {
     public boolean isAvailable() { return isAvailable; }
     public void setAvailable(boolean available) { isAvailable = available; }
 
-    public String getImage() {
-        return image;
-    }
+    public byte[] getImageData() { return imageData; }
+    public void setImageData(byte[] imageData) { this.imageData = imageData; }
 
-    public void setImage(String image) {
-        this.image = image;
-    }
+    public String getImageMimeType() { return imageMimeType; }
+    public void setImageMimeType(String imageMimeType) { this.imageMimeType = imageMimeType; }
 
     @Override
     public String toString() {
         return "Menu{" +
-                "id=" + menuId +
+                "menuId=" + menuId +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", categoryId=" + categoryId +
-                ", image='" + image + '\'' +
+                ", categoryName='" + categoryName + '\'' +
                 ", isAvailable=" + isAvailable +
+                ", imageMimeType='" + imageMimeType + '\'' +
+                ", imageData=" + (imageData != null ? imageData.length + " bytes" : "null") +
                 '}';
+    }
+
+    private int quantity = 1;
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Menu menu = (Menu) obj;
+        return this.getMenuId() == menu.getMenuId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.valueOf(menuId).hashCode();
     }
 }

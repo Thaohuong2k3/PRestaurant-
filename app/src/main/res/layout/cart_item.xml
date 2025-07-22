@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="?android:selectableItemBackground">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <!-- Item Name -->
+        <TextView
+            android:id="@+id/txtCartItemName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Item Name"
+            android:textSize="16sp" />
+
+        <!-- Quantity Controls -->
+        <Button
+            android:id="@+id/btnDecrease"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="＜"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtCartItemQuantity"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="1"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnIncrease"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="＞"
+            android:textSize="14sp" />
+
+        <!-- Price -->
+        <TextView
+            android:id="@+id/txtCartItemPrice"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="$0.00"
+            android:gravity="end"
+            android:paddingStart="8dp"
+            android:textSize="14sp" />
+
+        <!-- Remove -->
+        <Button
+            android:id="@+id/btnRemove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove"
+            android:textColor="#FF0000"
+            android:paddingStart="8dp" />
+    </LinearLayout>
+</LinearLayout>
