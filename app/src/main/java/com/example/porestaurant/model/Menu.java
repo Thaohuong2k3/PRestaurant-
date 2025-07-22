@@ -1,5 +1,7 @@
 package com.example.porestaurant.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Menu {
     private int menuId;
     private String name;
@@ -8,8 +10,11 @@ public class Menu {
     private int categoryId;
     private String categoryName;
     private boolean isAvailable;
+
     private transient byte[] imageData;
+    @SerializedName("imageMimeType")
     private String imageMimeType;
+    @SerializedName("imageData")
     private String imageDataBase64;
     public static final String CREATE_TABLE =
             "CREATE TABLE IF NOT EXISTS Menu (" +

@@ -49,9 +49,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 frag = new CombinedStatsFragment();
             } else if (id == R.id.nav_manage_menu) {
                 frag = new MenuManagementFragment();
-            } else if (id == R.id.nav_manage_table) {
-                frag = new TableManagementFragment();
-            }else if (id == R.id.nav_menu_stats) {
+            } else if (id == R.id.nav_menu_stats) {
                 frag = new TopMenuItemsFragment();
             }
             if (frag != null) {

@@ -46,17 +46,25 @@ public interface ApiService {
     @Multipart
     @POST("menu")
     Call<Menu> createMenu(
-        @Part("name") RequestBody name,
-        @Part("description") RequestBody description,
-        @Part("price") RequestBody price,
-        @Part("categoryId") RequestBody categoryId,
-        @Part("isAvailable") RequestBody isAvailable,
-        @Part MultipartBody.Part image
+            @Part("name") RequestBody name,
+            @Part("description") RequestBody description,
+            @Part("price") RequestBody price,
+            @Part("categoryId") RequestBody categoryId,
+            @Part("isAvailable") RequestBody isAvailable,
+            @Part MultipartBody.Part image
     );
 
-    @PUT("Menu/{id}")
-    Call<Void> updateMenu(@Path("id") int id, @Body Menu menu);
-
+    @Multipart
+    @PUT("menu/{id}")
+    Call<Menu> updateMenu(
+            @Path("id") int id,
+            @Part("name") RequestBody name,
+            @Part("description") RequestBody description,
+            @Part("price") RequestBody price,
+            @Part("categoryId") RequestBody categoryId,
+            @Part("isAvailable") RequestBody isAvailable,
+            @Part MultipartBody.Part image
+    );
     @DELETE("Menu/{id}")
     Call<Void> deleteMenu(@Path("id") int id);
 

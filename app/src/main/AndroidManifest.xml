@@ -18,10 +18,10 @@
             android:name=".view.AdminDashboardActivity"
             android:exported="true"
             android:label="Admin Dashboard">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN"/>-->
+<!--                <category android:name="android.intent.category.LAUNCHER"/>-->
+<!--            </intent-filter>-->
         </activity>
 
         <!-- Nếu bạn không muốn AdminDashboard là launcher,
@@ -32,12 +32,12 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.PORestaurant">
-            <!--
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            -->
+
         </activity>
         <activity android:name=".view.LoginActivity" />
         <activity android:name=".view.MenuActivity" />

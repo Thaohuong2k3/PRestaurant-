@@ -36,7 +36,7 @@ public class MenuRepository {
                                 byte[] decoded = Base64.decode(base64, Base64.DEFAULT);
                                 menu.setImageData(decoded);
                             } catch (IllegalArgumentException e) {
-                                callback.onError("Failed to decode image: " + e.getMessage());
+                                callback.onError("Không giải mã được ảnh: " + e.getMessage());
                                 return;
                             }
                         }
@@ -106,21 +106,42 @@ public class MenuRepository {
         });
     }
 
-    public void updateMenu(int id, Menu menu, final SimpleCallback callback) {
-        apiService.updateMenu(id, menu).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess();
-                } else {
-                    callback.onError("Update failed. Code: " + response.code());
-                }
-            }
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                callback.onError("Connection error: " + t.getMessage());
-            }
-        });
+    public void updateMenu(int id,
+                           Menu m,
+                           byte[] imgData,
+                           String mimeType,
+                           final SimpleCallback callback) {
+        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), m.getName());
+        RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), m.getDescription());
+        RequestBody price = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(m.getPrice()));
+        RequestBody catId = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(m.getCategoryId()));
+        RequestBody avail = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(m.isAvailable()));
+
+        // Biên dịch phần image
+        MultipartBody.Part imagePart;
+        if (imgData != null && imgData.length > 0 && mimeType != null) {
+            RequestBody file = RequestBody.create(MediaType.parse(mimeType), imgData);
+            imagePart = MultipartBody.Part.createFormData("imageFile", "upload.jpg", file);
+        } else {
+            RequestBody empty = RequestBody.create(MediaType.parse("application/octet-stream"), new byte[0]);
+            imagePart = MultipartBody.Part.createFormData("imageFile", "", empty);
+        }
+
+        apiService.updateMenu(id, name, desc, price, catId, avail, imagePart)
+                .enqueue(new Callback<Menu>() {
+                    @Override
+                    public void onResponse(Call<Menu> call, Response<Menu> response) {
+                        if (response.isSuccessful()) {
+                            callback.onSuccess();
+                        } else {
+                            callback.onError("Update failed. Code: " + response.code());
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<Menu> call, Throwable t) {
+                        callback.onError("Connection error: " + t.getMessage());
+                    }
+                });
     }
 
     public void deleteMenu(int id, final SimpleCallback callback) {

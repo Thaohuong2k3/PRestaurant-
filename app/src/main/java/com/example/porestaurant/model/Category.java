@@ -21,4 +21,9 @@ public class Category {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    @Override
+    public String toString() {
+        // Spinner sẽ gọi vào đây để lấy chuỗi hiển thị
+        return categoryName;
+    }
 }
