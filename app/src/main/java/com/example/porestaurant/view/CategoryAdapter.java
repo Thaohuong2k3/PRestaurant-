@@ -16,7 +16,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     private List<String> categories;
     private String selectedCategory = "All";
-    private OnCategoryClickListener listener;
+    private final OnCategoryClickListener listener;
 
     public interface OnCategoryClickListener {
         void onCategoryClick(String category);
@@ -28,7 +28,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     }
 
     public void setSelectedCategory(String category) {
-        selectedCategory = category;
+        this.selectedCategory = category;
         notifyDataSetChanged();
     }
 
@@ -45,23 +45,23 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         String category = categories.get(position);
         holder.txtCategory.setText(category);
 
-        // Highlight selected category
-        if (category.equals(selectedCategory)) {
-            holder.txtCategory.setBackgroundResource(R.drawable.bg_category_selected);
-        } else {
-            holder.txtCategory.setBackgroundResource(R.drawable.bg_category);
-        }
+        boolean isSelected = category.equalsIgnoreCase(selectedCategory);
+        holder.txtCategory.setBackgroundResource(
+                isSelected ? R.drawable.bg_category_selected : R.drawable.bg_category
+        );
 
         holder.txtCategory.setOnClickListener(v -> {
-            selectedCategory = category;
-            notifyDataSetChanged();
-            listener.onCategoryClick(category);
+            if (!category.equalsIgnoreCase(selectedCategory)) {
+                selectedCategory = category;
+                notifyDataSetChanged();
+                listener.onCategoryClick(category);
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return categories.size();
+        return categories != null ? categories.size() : 0;
     }
 
     static class CategoryViewHolder extends RecyclerView.ViewHolder {

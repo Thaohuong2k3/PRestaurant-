@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,12 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.porestaurant.R;
 import com.example.porestaurant.model.Menu;
 import com.example.porestaurant.model.CartStorage;
+import com.example.porestaurant.repository.CategoryRepository;
 import com.example.porestaurant.repository.MenuRepository;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -27,8 +27,10 @@ public class MenuActivity extends AppCompatActivity {
     private MenuAdapter menuAdapter;
     private CategoryAdapter categoryAdapter;
     private Button btnCart;
+    private SearchView searchViewMenu;
 
     private List<Menu> allMenus = new ArrayList<>();
+    private String selectedCategory = "All"; // Track selected category
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,20 @@ public class MenuActivity extends AppCompatActivity {
         recyclerViewCategory.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         );
+
+        searchViewMenu = findViewById(R.id.searchViewMenu);
+        searchViewMenu.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false; // Not using submit
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterMenus();
+                return true;
+            }
+        });
 
         Button btnCreateMenu = findViewById(R.id.btnCreateMenu);
         btnCart = findViewById(R.id.btnCart);
@@ -83,8 +99,8 @@ public class MenuActivity extends AppCompatActivity {
                     });
                     recyclerViewMenu.setAdapter(menuAdapter);
 
-                    // Setup category filter
-                    setupCategoryFilter(menuList);
+                    // Load categories from API
+                    loadCategoriesFromApi();
                 });
             }
 
@@ -98,32 +114,52 @@ public class MenuActivity extends AppCompatActivity {
         });
     }
 
-    private void setupCategoryFilter(List<Menu> menuList) {
-        Set<String> categorySet = new LinkedHashSet<>();
-        categorySet.add("All"); // Default
-        for (Menu menu : menuList) {
-            if (menu.getCategoryName() != null) {
-                categorySet.add(menu.getCategoryName());
+    private void loadCategoriesFromApi() {
+        CategoryRepository categoryRepository = new CategoryRepository();
+        categoryRepository.getAllCategories(new CategoryRepository.CategoryCallback() {
+            @Override
+            public void onSuccess(List<com.example.porestaurant.model.Category> categoryList) {
+                runOnUiThread(() -> {
+                    List<String> categories = new ArrayList<>();
+                    categories.add("All"); // default
+
+                    for (com.example.porestaurant.model.Category cat : categoryList) {
+                        if (cat.getCategoryName() != null) {
+                            categories.add(cat.getCategoryName());
+                        }
+                    }
+
+                    categoryAdapter = new CategoryAdapter(categories, selected -> {
+                        selectedCategory = selected;
+                        filterMenus();
+                    });
+
+                    recyclerViewCategory.setAdapter(categoryAdapter);
+                });
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                runOnUiThread(() -> Toast.makeText(MenuActivity.this, "Category load failed: " + errorMessage, Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private void filterMenus() {
+        String searchQuery = searchViewMenu.getQuery().toString().toLowerCase().trim();
+        List<Menu> filtered = new ArrayList<>();
+
+        for (Menu m : allMenus) {
+            boolean matchesCategory = selectedCategory.equals("All") ||
+                    (m.getCategoryName() != null && selectedCategory.equals(m.getCategoryName()));
+            boolean matchesSearch = m.getName().toLowerCase().contains(searchQuery);
+
+            if (matchesCategory && matchesSearch) {
+                filtered.add(m);
             }
         }
 
-        List<String> categories = new ArrayList<>(categorySet);
-
-        categoryAdapter = new CategoryAdapter(categories, selectedCategory -> {
-            if ("All".equals(selectedCategory)) {
-                menuAdapter.updateList(allMenus);
-            } else {
-                List<Menu> filtered = new ArrayList<>();
-                for (Menu m : allMenus) {
-                    if (selectedCategory.equals(m.getCategoryName())) {
-                        filtered.add(m);
-                    }
-                }
-                menuAdapter.updateList(filtered);
-            }
-        });
-
-        recyclerViewCategory.setAdapter(categoryAdapter);
+        menuAdapter.updateList(filtered);
     }
 
     private void updateCartCount() {
@@ -133,5 +169,10 @@ public class MenuActivity extends AppCompatActivity {
             count += item.getQuantity();
         }
         btnCart.setText("Cart (" + count + ")");
+    }
+
+    public void updateList(List<Menu> newList) {
+        allMenus = newList;
+        menuAdapter.notifyDataSetChanged();
     }
 }

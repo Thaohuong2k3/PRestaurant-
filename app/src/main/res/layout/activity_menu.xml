@@ -19,11 +19,11 @@
             android:id="@+id/btnCart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cart"
+            android:text="Cart (0)"
             android:backgroundTint="?attr/colorPrimary"
             android:textColor="@android:color/white"
-            android:elevation="4dp"
-            android:paddingHorizontal="12dp" />
+            android:paddingHorizontal="12dp"
+            android:elevation="4dp" />
 
         <TextView
             android:id="@+id/txtCartCount"
@@ -40,6 +40,18 @@
             android:layout_marginEnd="4dp" />
     </FrameLayout>
 
+    <!-- Search View -->
+    <SearchView
+        android:id="@+id/searchViewMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:queryHint="Search menu..."
+        android:iconifiedByDefault="false"
+        app:layout_constraintTop_toBottomOf="@+id/cartContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp" />
+
     <!-- Horizontal RecyclerView for Categories -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerCategory"
@@ -48,9 +60,9 @@
         android:paddingVertical="8dp"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/cartContainer"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/searchViewMenu"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
