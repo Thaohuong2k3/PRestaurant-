@@ -39,12 +39,14 @@
             </intent-filter>
             -->
         </activity>
-
-        <!-- Activity xử lý Login -->
-        <activity
-            android:name=".view.LoginActivity"
-            android:exported="true"
-            android:label="Login"/>
+        <activity android:name=".view.LoginActivity" />
+        <activity android:name=".view.MenuActivity" />
+        <activity android:name=".view.ActivityProfile" />
+        <activity android:name=".view.RegisterActivity" />
+        <activity android:name=".view.BookingActivity" />
+        <activity android:name=".view.CreateMenuActivity" />
+        <activity android:name=".view.CartActivity" />
+        <activity android:name=".view.ForgotPasswordActivity" />
     </application>
 
 </manifest>

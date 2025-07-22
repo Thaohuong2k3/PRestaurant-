@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PORestaurant</string>
+    <string name="login_image">Login illustration</string>
 </resources>
