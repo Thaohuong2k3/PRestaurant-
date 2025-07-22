@@ -11,6 +11,7 @@ import com.example.porestaurant.model.Category;
 import com.example.porestaurant.model.TableDTO;
 import com.example.porestaurant.model.TableBookingRequest;
 import com.example.porestaurant.model.TableStatusUpdateRequest;
+import com.example.porestaurant.model.VerifyOtpRequest;
 
 import java.util.List;
 
@@ -44,6 +45,16 @@ public interface ApiService {
 
     @POST("users/forgot-password")
     Call<ResponseBody> forgotPassword(@Body String email);
+    //@POST("users/forgotpassapp/request-otp")
+    //Call<MessageResponse> requestOtp(@Body ForgotPasswordRequest request);
+
+   // @POST("users/forgotpassapp/verify-otp")
+   // Call<MessageResponse> verifyOtp(@Body VerifyOtpRequest request);
+    @POST("users/forgotpassapp/request-otp")
+    Call<ResponseBody> requestOtp(@Body ForgotPasswordRequest request);
+
+    @POST("users/forgotpassapp/verify-otp")
+    Call<ResponseBody> verifyOtp(@Body VerifyOtpRequest request);
 
     // ====== MENU ENDPOINTS ======
     @GET("Menu")

@@ -16,7 +16,7 @@ import com.example.porestaurant.repository.UserRepository;
 
 public class ActivityProfile extends AppCompatActivity {
     private EditText edtProfileFullName, edtProfilePassword, edtProfileConfirmPass;
-    private TextView tvProfileEmail;
+    private TextView tvProfileEmail, tvProfileEmailReadonly;
     private Button btnProfileUpdate, btnProfileLogout;
     private ImageView btnProfileBack; // Thêm khai báo này
     private SharedPreferences sharedPreferences;
@@ -36,7 +36,7 @@ public class ActivityProfile extends AppCompatActivity {
         btnProfileUpdate = findViewById(R.id.btnProfileUpdate);
         btnProfileLogout = findViewById(R.id.btnProfileLogout);
         btnProfileBack = findViewById(R.id.btnProfileBack); // Ánh xạ nút back
-
+        tvProfileEmailReadonly = findViewById(R.id.tvProfileEmailReadonly);
         userRepository = new UserRepository();
         sharedPreferences = getSharedPreferences("LOGIN_PREF", MODE_PRIVATE);
 
@@ -47,6 +47,7 @@ public class ActivityProfile extends AppCompatActivity {
 
         edtProfileFullName.setText(fullName);
         tvProfileEmail.setText(email);
+        tvProfileEmailReadonly.setText(email);
 
         // Sự kiện update profile
         btnProfileUpdate.setOnClickListener(v -> doUpdateProfile());
