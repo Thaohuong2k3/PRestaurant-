@@ -89,6 +89,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
             } else if (id == R.id.nav_manage_table) {
                 //TODO
             }
+            else if (id == R.id.nav_category) {
+                fragment = new CategoryListFragment();
+            }
 
             if (fragment != null) {
                 Bundle args = new Bundle();

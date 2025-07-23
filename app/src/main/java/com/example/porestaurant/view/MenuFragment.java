@@ -143,11 +143,21 @@ public class MenuFragment extends Fragment {
                         }
                     }
 
-                    categoryAdapter = new CategoryAdapter(categories, selected -> {
-                        selectedCategory = selected;
-                        filterMenus();
-                    });
+                    categoryAdapter = new CategoryAdapter(categories, new CategoryAdapter.OnCategoryClickListener() {
+                        @Override
+                        public void onCategoryClick(String selected) {
+                            // Khi click 1 category
+                            selectedCategory = selected;
+                            categoryAdapter.setSelectedCategory(selected);
+                            filterMenus();
+                        }
 
+                        @Override
+                        public void onCategoryLongClick(String category, int position) {
+                            // Ở màn MenuFragment bạn không cần xử lý long‑click,
+                            // nên có thể để trống hoặc ignore
+                        }
+                    });
                     recyclerViewCategory.setAdapter(categoryAdapter);
                 });
             }

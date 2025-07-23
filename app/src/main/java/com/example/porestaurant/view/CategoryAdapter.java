@@ -11,86 +11,121 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.porestaurant.R;
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
-    private List<String> categories;
+    public interface OnCategoryClickListener {
+        /** Click bình thường để edit */
+        void onCategoryClick(String category);
+        /** Long‑click để delete */
+        void onCategoryLongClick(String category, int position);
+    }
+
+    private final List<String> categories;
     private String selectedCategory = "All";
     private final OnCategoryClickListener listener;
 
-    public interface OnCategoryClickListener {
-        void onCategoryClick(String category);
-    }
-
     public CategoryAdapter(List<String> categories, OnCategoryClickListener listener) {
-        this.categories = categories;
+        this.categories = categories != null
+                ? new ArrayList<>(categories)
+                : new ArrayList<>();
         this.listener = listener;
     }
 
+    /** Thay toàn bộ danh sách */
+    public void setCategories(List<String> newList) {
+        categories.clear();
+        if (newList != null) categories.addAll(newList);
+        notifyDataSetChanged();
+    }
+
+    /** Thêm mới */
+    public void addCategory(String c) {
+        categories.add(0, c);
+        notifyItemInserted(0);
+    }
+
+    /** Cập nhật */
+    public void updateCategory(int pos, String c) {
+        if (pos >= 0 && pos < categories.size()) {
+            categories.set(pos, c);
+            notifyItemChanged(pos);
+        }
+    }
+
+    /** Xóa */
+    public void removeCategory(int pos) {
+        if (pos >= 0 && pos < categories.size()) {
+            categories.remove(pos);
+            notifyItemRemoved(pos);
+        }
+    }
+
+    /** Highlight */
     public void setSelectedCategory(String category) {
         this.selectedCategory = category;
         notifyDataSetChanged();
     }
 
-    @NonNull
-    @Override
+    @NonNull @Override
     public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.category_item, parent, false);
-        return new CategoryViewHolder(view);
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_category, parent, false);
+        return new CategoryViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
-        String category = categories.get(position);
-        holder.txtCategory.setText(category);
+    public void onBindViewHolder(@NonNull CategoryViewHolder holder, int pos) {
+        String cat = categories.get(pos);
+        holder.txtCategory.setText(cat);
 
-        boolean isSelected = category.equalsIgnoreCase(selectedCategory);
-
-        // Update card appearance based on selection
-        if (isSelected) {
+        boolean isSel = cat.equalsIgnoreCase(selectedCategory);
+        if (isSel) {
             holder.cardView.setCardBackgroundColor(
-                    holder.itemView.getContext().getColor(R.color.primary_color)
-            );
+                    holder.itemView.getContext().getColor(R.color.primary_color));
             holder.txtCategory.setTextColor(
-                    holder.itemView.getContext().getColor(android.R.color.white)
-            );
+                    holder.itemView.getContext().getColor(android.R.color.white));
             holder.cardView.setStrokeWidth(0);
         } else {
             holder.cardView.setCardBackgroundColor(
-                    holder.itemView.getContext().getColor(android.R.color.white)
-            );
+                    holder.itemView.getContext().getColor(android.R.color.white));
             holder.txtCategory.setTextColor(
-                    holder.itemView.getContext().getColor(R.color.primary_text)
-            );
+                    holder.itemView.getContext().getColor(R.color.primary_text));
             holder.cardView.setStrokeWidth(2);
             holder.cardView.setStrokeColor(
-                    holder.itemView.getContext().getColor(R.color.divider_color)
-            );
+                    holder.itemView.getContext().getColor(R.color.divider_color));
         }
 
+        // Click để edit
         holder.cardView.setOnClickListener(v -> {
-            if (!category.equalsIgnoreCase(selectedCategory)) {
-                selectedCategory = category;
+            if (!cat.equalsIgnoreCase(selectedCategory)) {
+                selectedCategory = cat;
                 notifyDataSetChanged();
-                listener.onCategoryClick(category);
             }
+            listener.onCategoryClick(cat);
+        });
+
+        // Long‑click để delete
+        holder.cardView.setOnLongClickListener(v -> {
+            listener.onCategoryLongClick(cat, pos);
+            return true;
         });
     }
 
     @Override
     public int getItemCount() {
-        return categories != null ? categories.size() : 0;
+        return categories.size();
     }
 
     static class CategoryViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardView;
         TextView txtCategory;
 
-        public CategoryViewHolder(@NonNull View itemView) {
+        CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            cardView = itemView.findViewById(R.id.cardView);
+            cardView    = itemView.findViewById(R.id.cardView);
             txtCategory = itemView.findViewById(R.id.txtCategory);
         }
     }

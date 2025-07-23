@@ -19,4 +19,8 @@
         android:id="@+id/nav_manage_table"
         android:icon="@drawable/ic_table_restaurant"
         android:title="Tables"/>
+    <item
+        android:id="@+id/nav_category"
+        android:icon="@drawable/ic_category"
+        android:title="Category"/>
 </menu>

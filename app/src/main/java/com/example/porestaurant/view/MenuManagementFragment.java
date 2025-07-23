@@ -26,6 +26,7 @@ import com.example.porestaurant.network.ApiService;
 import com.example.porestaurant.repository.MenuRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -135,7 +136,7 @@ public class MenuManagementFragment extends Fragment {
         EditText etPrice     = form.findViewById(R.id.etMenuPrice);
         EditText etDesc      = form.findViewById(R.id.etMenuDescription);
         Spinner spCat        = form.findViewById(R.id.spMenuCategory);
-        CheckBox cbAvail     = form.findViewById(R.id.cbMenuAvailable);
+        SwitchMaterial cbAvail = form.findViewById(R.id.cbMenuAvailable);
 
         ArrayAdapter<Category> spAdapter = new ArrayAdapter<>(
                 getContext(),
