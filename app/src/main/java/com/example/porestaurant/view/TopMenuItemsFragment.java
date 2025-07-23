@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.porestaurant.R;
 import com.example.porestaurant.model.Admin;
@@ -19,14 +21,16 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TopMenuItemsFragment extends Fragment {
     private PieChart chart;
+    private RecyclerView rvTopItems;
+    private TopMenuItemsAdapter adapter;
     private StatisticalRepository repo;
+    private int year = 2025;
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -38,25 +42,51 @@ public class TopMenuItemsFragment extends Fragment {
     @Override public void onViewCreated(@NonNull View v,
                                         @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
+
+        // Initialize views
         chart = v.findViewById(R.id.pieChartTopMenu);
-        repo   = new StatisticalRepository();
+        rvTopItems = v.findViewById(R.id.rvTopItems);
+        repo = new StatisticalRepository();
 
-        // 1. Tắt mô tả mặc định
+        // Get year from arguments if available
+        if (getArguments() != null) {
+            year = getArguments().getInt("year", 2025);
+        }
+
+        // Setup RecyclerView
+        setupRecyclerView();
+
+        // Setup chart
+        setupChart();
+
+        // Load data
+        loadData();
+    }
+
+    private void setupRecyclerView() {
+        adapter = new TopMenuItemsAdapter();
+        rvTopItems.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvTopItems.setAdapter(adapter);
+    }
+
+    private void setupChart() {
+        // Remove description and background
         chart.getDescription().setEnabled(false);
-
-        // 2. Chuyển thành donut, thêm tiêu đề
         chart.setDrawHoleEnabled(true);
         chart.setHoleRadius(45f);
         chart.setTransparentCircleRadius(50f);
-        chart.setCenterText("Top 5 món bán chạy nhất");
-        chart.setCenterTextSize(18f);
-
-        // 3. Hiển thị entry labels (tên món) ngay trên slice
-        chart.setDrawEntryLabels(true);
+        chart.setDrawEntryLabels(false);
         chart.setEntryLabelColor(Color.BLACK);
         chart.setEntryLabelTextSize(12f);
+        chart.setDrawMarkers(true);
+        chart.setHighlightPerTapEnabled(true);
 
-        // 4. Legend bên dưới chỉ hiển thị tên món
+        // Center text
+        chart.setCenterText("Top 5\nItems");
+        chart.setCenterTextSize(16f);
+        chart.setCenterTextColor(getResources().getColor(R.color.admin_text_primary));
+
+        // Legend
         Legend legend = chart.getLegend();
         legend.setEnabled(true);
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -65,54 +95,79 @@ public class TopMenuItemsFragment extends Fragment {
         legend.setDrawInside(false);
         legend.setWordWrapEnabled(true);
         legend.setTextSize(12f);
-
-        // Load data và vẽ
-        loadData();
+        legend.setTextColor(getResources().getColor(R.color.admin_text_primary));
+        legend.setXEntrySpace(10f);
     }
 
     private void loadData() {
         repo.getTopMenuItems(
                 5,
-                "2025-01-01",
-                "2025-12-31",
+                year + "-01-01",
+                year + "-12-31",
                 new StatisticalRepository.TopMenuCallback() {
                     @Override public void onSuccess(List<Admin.TopMenuItemDto> data) {
-                        List<PieEntry> entries = new ArrayList<>();
-                        for (Admin.TopMenuItemDto d : data) {
-                            entries.add(new PieEntry(d.getTotalSold(), d.getName()));
-                        }
+                        if (getActivity() == null) return;
 
-                        PieDataSet set = new PieDataSet(entries, "");
-                        set.setColors(ColorTemplate.MATERIAL_COLORS);
-                        set.setSliceSpace(2f);
+                        getActivity().runOnUiThread(() -> {
+                            // Update RecyclerView
+                            adapter.setItems(data);
 
-                        // 5. Hiển thị giá trị (số lượng) ngoài slice với đường nối
-                        set.setValueLinePart1Length(0.5f);
-                        set.setValueLinePart2Length(0.3f);
-                        set.setValueLineColor(Color.BLACK);
-                        set.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-                        set.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-
-                        // Formatter chỉ in số nguyên
-                        set.setValueTextSize(12f);
-                        set.setValueTextColor(Color.BLACK);
-                        set.setValueFormatter(new ValueFormatter() {
-                            @Override public String getFormattedValue(float value) {
-                                return String.valueOf((int) value);
-                            }
+                            // Update chart
+                            updateChart(data);
                         });
-
-                        PieData pieData = new PieData(set);
-                        pieData.setDrawValues(true);   // bật hiển thị giá trị ngoài slice
-
-                        chart.setData(pieData);
-                        chart.animateY(800);
-                        chart.invalidate();
                     }
+
                     @Override public void onError(String error) {
-                        // TODO: show error
+                        // Handle error
                     }
                 }
         );
+    }
+
+    private void updateChart(List<Admin.TopMenuItemDto> data) {
+        List<PieEntry> entries = new ArrayList<>();
+
+        // Create entries for pie chart
+        for (Admin.TopMenuItemDto item : data) {
+            entries.add(new PieEntry(item.getTotalSold(), item.getName()));
+        }
+
+        // Create dataset
+        PieDataSet dataSet = new PieDataSet(entries, "");
+
+        // Set colors
+        int[] colors = new int[] {
+                getResources().getColor(R.color.admin_chart_color1),
+                getResources().getColor(R.color.admin_chart_color2),
+                getResources().getColor(R.color.admin_chart_color3),
+                getResources().getColor(R.color.admin_chart_color4),
+                getResources().getColor(R.color.admin_chart_color5)
+        };
+        dataSet.setColors(colors);
+
+        // Styling
+        dataSet.setSliceSpace(2f);
+        dataSet.setValueLinePart1Length(0.5f);
+        dataSet.setValueLinePart2Length(0.3f);
+        dataSet.setValueLineColor(getResources().getColor(R.color.admin_text_secondary));
+        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        dataSet.setValueTextSize(12f);
+        dataSet.setValueTextColor(getResources().getColor(R.color.admin_text_primary));
+
+        // Format values as integers
+        dataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value);
+            }
+        });
+
+        // Create and set data
+        PieData pieData = new PieData(dataSet);
+        chart.setData(pieData);
+
+        // Animate and refresh
+        chart.animateY(1000);
+        chart.invalidate();
     }
 }

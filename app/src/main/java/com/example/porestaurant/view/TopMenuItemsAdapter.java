@@ -34,8 +34,35 @@ public class TopMenuItemsAdapter extends RecyclerView.Adapter<TopMenuItemsAdapte
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         Admin.TopMenuItemDto dto = items.get(position);
+
+        // Set rank (position + 1)
+        holder.tvRank.setText(String.valueOf(position + 1));
+
+        // Set item name
         holder.tvName.setText(dto.getName());
+
+        // Set sold count
         holder.tvSold.setText(String.valueOf(dto.getTotalSold()));
+
+        // Set rank background color based on position
+        int colorResId;
+        switch (position) {
+            case 0:
+                colorResId = R.color.admin_gold;
+                break;
+            case 1:
+                colorResId = R.color.admin_silver;
+                break;
+            case 2:
+                colorResId = R.color.admin_bronze;
+                break;
+            default:
+                colorResId = R.color.admin_text_secondary;
+                break;
+        }
+        holder.tvRank.getBackground().setTint(
+                holder.itemView.getContext().getResources().getColor(colorResId)
+        );
     }
 
     @Override public int getItemCount() {
@@ -43,9 +70,11 @@ public class TopMenuItemsAdapter extends RecyclerView.Adapter<TopMenuItemsAdapte
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView tvName, tvSold;
+        TextView tvRank, tvName, tvSold;
+
         VH(@NonNull View itemView) {
             super(itemView);
+            tvRank = itemView.findViewById(R.id.tvRank);
             tvName = itemView.findViewById(R.id.tvItemName);
             tvSold = itemView.findViewById(R.id.tvItemSold);
         }

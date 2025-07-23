@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -46,6 +47,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private LatLng staticDestination = new LatLng(37.7749, -122.4194); // San Francisco
     private LatLng currentLocation;
+    private ProgressBar loadingProgressBar;
 
     @Nullable
     @Override
@@ -57,6 +59,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        loadingProgressBar = view.findViewById(R.id.loadingProgressBar);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -73,6 +76,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.addMarker(new MarkerOptions().position(staticDestination).title("Destination"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(staticDestination, 10));
         checkLocationPermission();
+        loadingProgressBar.setVisibility(View.GONE); // Hide loading once map is ready
     }
 
     private void checkLocationPermission() {
@@ -97,6 +101,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             checkLocationPermission();
             return;
         }
+        loadingProgressBar.setVisibility(View.VISIBLE); // Show loading when starting route fetch
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
                     @Override
@@ -108,6 +113,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             getDirections(currentLocation, staticDestination);
                             Toast.makeText(requireContext(), "Location found! Getting route...", Toast.LENGTH_SHORT).show();
                         } else {
+                            loadingProgressBar.setVisibility(View.GONE); // Hide loading on failure
                             Toast.makeText(requireContext(), "Unable to get current location", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -130,6 +136,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         call.enqueue(new Callback<DirectionsResponse>() {
             @Override
             public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+                loadingProgressBar.setVisibility(View.GONE); // Hide loading after response
                 if (response.isSuccessful() && response.body() != null) {
                     DirectionsResponse directionsResponse = response.body();
                     if (directionsResponse.routes != null && !directionsResponse.routes.isEmpty()) {
@@ -144,6 +151,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             @Override
             public void onFailure(Call<DirectionsResponse> call, Throwable t) {
+                loadingProgressBar.setVisibility(View.GONE); // Hide loading on failure
                 Log.e("DirectionsAPI", "API call failed", t);
                 Toast.makeText(requireContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -199,6 +207,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 enableMyLocation();
                 Toast.makeText(requireContext(), "Location permission granted", Toast.LENGTH_SHORT).show();
             } else {
+                loadingProgressBar.setVisibility(View.GONE); // Hide loading if permission denied
                 Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show();
             }
         }

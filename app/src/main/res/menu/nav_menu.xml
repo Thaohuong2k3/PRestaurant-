@@ -6,7 +6,7 @@
     <item
         android:id="@+id/nav_cart"
         android:icon="@drawable/ic_cart"
-        android:title="Cart (0)" />
+        android:title="Cart" />
     <item
         android:id="@+id/nav_menu"
         android:icon="@drawable/ic_restaurant_menu"
@@ -19,4 +19,8 @@
         android:id="@+id/nav_logout"
         android:icon="@drawable/ic_logout"
         android:title="Logout" />
+    <item
+        android:id="@+id/nav_login"
+        android:icon="@drawable/ic_login"
+        android:title="Login" />
 </menu>

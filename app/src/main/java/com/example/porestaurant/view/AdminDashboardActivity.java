@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -12,64 +13,108 @@ import androidx.fragment.app.Fragment;
 import com.example.porestaurant.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class AdminDashboardActivity extends AppCompatActivity {
     private int selectedYear = 2025;
+    private TextView txtCurrentDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
 
-        // --- Spinner chọn năm ---
+        initViews();
+        setupYearSpinner();
+        setupBottomNavigation();
+        updateCurrentDate();
+    }
+
+    private void initViews() {
+        txtCurrentDate = findViewById(R.id.txtCurrentDate);
+    }
+
+    private void updateCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM dd, yyyy", Locale.getDefault());
+        String currentDate = sdf.format(new Date());
+        txtCurrentDate.setText(currentDate);
+    }
+
+    private void setupYearSpinner() {
         Spinner spinnerYear = findViewById(R.id.spinnerYear);
-        String[] years = {"2023","2024","2025","2026"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        String[] years = {"2023", "2024", "2025", "2026"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 this,
-                android.R.layout.simple_spinner_item,
+                R.layout.spinner_item_admin,
                 years
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ) {
+            @Override
+            public View getDropDownView(int position, View convertView, android.view.ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                view.setBackgroundResource(R.drawable.spinner_dropdown_background);
+                return view;
+            }
+        };
+
         spinnerYear.setAdapter(adapter);
-        spinnerYear.setSelection(2); // mặc định 2025
+        spinnerYear.setSelection(2); // Default 2025
+
         spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 selectedYear = Integer.parseInt(years[pos]);
-                // reload fragment với năm mới
                 reloadCurrentFragment();
             }
-            @Override public void onNothingSelected(AdapterView<?> parent) { }
-        });
 
-        // --- BottomNavigation ---
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+    }
+
+    private void setupBottomNavigation() {
         BottomNavigationView bottomNav = findViewById(R.id.admin_bottom_nav);
         bottomNav.setOnNavigationItemSelectedListener(item -> {
-            Fragment frag = null;
+            Fragment fragment = null;
             int id = item.getItemId();
-            if ( id == R.id.nav_stats) {
-                frag = new CombinedStatsFragment();
+
+            if (id == R.id.nav_stats) {
+                fragment = new CombinedStatsFragment();
             } else if (id == R.id.nav_manage_menu) {
-                frag = new MenuManagementFragment();
+                fragment = new MenuManagementFragment();
             } else if (id == R.id.nav_menu_stats) {
-                frag = new TopMenuItemsFragment();
+                fragment = new TopMenuItemsFragment();
+            } else if (id == R.id.nav_manage_table) {
+                //TODO
             }
-            if (frag != null) {
+
+            if (fragment != null) {
                 Bundle args = new Bundle();
                 args.putInt("year", selectedYear);
-                frag.setArguments(args);
+                fragment.setArguments(args);
+
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.admin_fragment_container, frag)
+                        .setCustomAnimations(
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left,
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right
+                        )
+                        .replace(R.id.admin_fragment_container, fragment)
                         .commit();
                 return true;
             }
             return false;
         });
-        // Chọn launcher item mặc định và load nó
+
+        // Set default selection
         bottomNav.setSelectedItemId(R.id.nav_stats);
     }
 
     private void reloadCurrentFragment() {
-        // gọi lại như khi click nav để truyền lại year mới
         BottomNavigationView nav = findViewById(R.id.admin_bottom_nav);
         nav.setSelectedItemId(nav.getSelectedItemId());
     }

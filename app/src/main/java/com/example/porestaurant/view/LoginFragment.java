@@ -127,6 +127,7 @@ public class LoginFragment extends Fragment {
                     editor.putInt("userId", user.getUserID());
                     editor.putString("fullName", user.getFullName());
                     editor.putString("email", user.getEmail());
+                    editor.putString("role", user.getRole());
                     editor.apply();
                     if (chkRemember.isChecked()) {
                         editor.putString("password", password);
@@ -138,9 +139,17 @@ public class LoginFragment extends Fragment {
                     editor.apply();
 
                     Toast.makeText(requireContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    // Navigate to ProfileFragment
-                    if (getActivity() instanceof MainActivity) {
-                        ((MainActivity) getActivity()).loadFragment(new ProfileFragment());
+                    if (user.getRole().equalsIgnoreCase("Admin")) {
+                        // Navigate to admin dashboard
+                        Intent intent = new Intent(requireContext(), AdminDashboardActivity.class);
+                        startActivity(intent);
+                        requireActivity().finish(); // Optional: close login activity
+                    } else {
+                        // Navigate to profile for customers
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).updateNavigationMenu();
+                            ((MainActivity) getActivity()).loadFragment(new MenuFragment());
+                        }
                     }
                 });
             }
@@ -174,6 +183,7 @@ public class LoginFragment extends Fragment {
                     editor.putInt("userId", user.getUserID());
                     editor.putString("fullName", user.getFullName());
                     editor.putString("email", user.getEmail());
+                    editor.putString("role", user.getRole());
                     editor.apply();
 
                     // Nếu có Remember Me (tuỳ bạn có tích hợp hay không)
@@ -188,9 +198,17 @@ public class LoginFragment extends Fragment {
                     editor.apply();
 
                     Toast.makeText(requireContext(), "Đăng nhập Google thành công!", Toast.LENGTH_SHORT).show();
-                    // Navigate to ProfileFragment
-                    if (getActivity() instanceof MainActivity) {
-                        ((MainActivity) getActivity()).loadFragment(new ProfileFragment());
+                    if (user.getRole().equalsIgnoreCase("Admin")) {
+                        // Navigate to admin dashboard
+                        Intent intent = new Intent(requireContext(), AdminDashboardActivity.class);
+                        startActivity(intent);
+                        requireActivity().finish(); // Optional: close login activity
+                    } else {
+                        // Navigate to profile for customers
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).updateNavigationMenu();
+                            ((MainActivity) getActivity()).loadFragment(new MenuFragment());
+                        }
                     }
                 });
             }

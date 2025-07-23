@@ -4,7 +4,7 @@
 <!--    <style name="Theme.PORestaurant" parent="android:Theme.Material.Light.NoActionBar" />-->
 <!--</resources>-->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.PORestaurant" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.PORestaurant" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color -->
         <item name="colorPrimary">@color/accent_primary</item>
         <item name="colorPrimaryVariant">@color/surface_primary</item>

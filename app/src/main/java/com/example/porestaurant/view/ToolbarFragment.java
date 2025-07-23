@@ -18,23 +18,6 @@ import com.example.porestaurant.R;
 
 public class ToolbarFragment extends Fragment {
 
-    public interface ToolbarListener {
-        void onSearchClicked();
-        void onFilterClicked();
-    }
-
-    private ToolbarListener toolbarListener;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof ToolbarListener) {
-            toolbarListener = (ToolbarListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement ToolbarListener");
-        }
-    }
-
     private ImageView hamburgerMenu;
     private DrawerLayout drawerLayout;
 
@@ -58,8 +41,6 @@ public class ToolbarFragment extends Fragment {
 
     private void initViews(View view) {
         hamburgerMenu = view.findViewById(R.id.iv_hamburger);
-//        searchIcon = view.findViewById(R.id.iv_search);
-//        filterIcon = view.findViewById(R.id.iv_filter);
     }
 
     private void setupClickListeners() {

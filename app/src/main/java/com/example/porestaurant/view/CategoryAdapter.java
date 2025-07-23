@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.porestaurant.R;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -46,11 +47,30 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         holder.txtCategory.setText(category);
 
         boolean isSelected = category.equalsIgnoreCase(selectedCategory);
-        holder.txtCategory.setBackgroundResource(
-                isSelected ? R.drawable.bg_category_selected : R.drawable.bg_category
-        );
 
-        holder.txtCategory.setOnClickListener(v -> {
+        // Update card appearance based on selection
+        if (isSelected) {
+            holder.cardView.setCardBackgroundColor(
+                    holder.itemView.getContext().getColor(R.color.primary_color)
+            );
+            holder.txtCategory.setTextColor(
+                    holder.itemView.getContext().getColor(android.R.color.white)
+            );
+            holder.cardView.setStrokeWidth(0);
+        } else {
+            holder.cardView.setCardBackgroundColor(
+                    holder.itemView.getContext().getColor(android.R.color.white)
+            );
+            holder.txtCategory.setTextColor(
+                    holder.itemView.getContext().getColor(R.color.primary_text)
+            );
+            holder.cardView.setStrokeWidth(2);
+            holder.cardView.setStrokeColor(
+                    holder.itemView.getContext().getColor(R.color.divider_color)
+            );
+        }
+
+        holder.cardView.setOnClickListener(v -> {
             if (!category.equalsIgnoreCase(selectedCategory)) {
                 selectedCategory = category;
                 notifyDataSetChanged();
@@ -65,10 +85,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     }
 
     static class CategoryViewHolder extends RecyclerView.ViewHolder {
+        MaterialCardView cardView;
         TextView txtCategory;
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardView = itemView.findViewById(R.id.cardView);
             txtCategory = itemView.findViewById(R.id.txtCategory);
         }
     }
