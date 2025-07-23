@@ -165,6 +165,7 @@ public class MenuFragment extends Fragment {
     }
 
     private void updateCartCount() {
+        if (navigationView == null) return;
         MenuItem cartAmount = navigationView.getMenu().findItem(R.id.nav_cart);
         List<Menu> cart = CartStorage.getCart(requireContext());
         int count = 0;

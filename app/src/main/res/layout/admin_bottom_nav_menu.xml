@@ -20,4 +20,10 @@
         android:id="@+id/nav_manage_table"
         android:icon="@drawable/ic_table_management"
     android:title="Bàn Quản lý"/>
+
+    <item
+        android:id="@+id/nav_update_status_table"
+        android:icon="@drawable/ic_update_status"
+        android:title="Cập nhật trạng thái bàn" />
+
 </menu>

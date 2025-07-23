@@ -52,6 +52,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
             } else if (id == R.id.nav_menu_stats) {
                 frag = new TopMenuItemsFragment();
             }
+            else if (id == R.id.nav_update_status_table) {
+                // Đây là mục Cập nhật trạng thái bàn
+                frag = new UpdateTableStatusFragment();  // Fragment mới để cập nhật trạng thái bàn
+            }
             if (frag != null) {
                 Bundle args = new Bundle();
                 args.putInt("year", selectedYear);
