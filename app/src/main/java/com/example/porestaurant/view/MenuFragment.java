@@ -3,6 +3,7 @@ package com.example.porestaurant.view;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import com.example.porestaurant.model.Menu;
 import com.example.porestaurant.model.CartStorage;
 import com.example.porestaurant.repository.CategoryRepository;
 import com.example.porestaurant.repository.MenuRepository;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +31,9 @@ public class MenuFragment extends Fragment {
     private RecyclerView recyclerViewCategory;
     private MenuAdapter menuAdapter;
     private CategoryAdapter categoryAdapter;
-    private Button btnCart;
     private SearchView searchViewMenu;
-    private Button btnCreateMenu;
-
     private List<Menu> allMenus = new ArrayList<>();
+    private NavigationView navigationView;
     private String selectedCategory = "All"; // Track selected category
 
     @Nullable
@@ -53,6 +53,7 @@ public class MenuFragment extends Fragment {
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         );
 
+        navigationView = view.findViewById(R.id.nav_view);
         searchViewMenu = view.findViewById(R.id.searchViewMenu);
         searchViewMenu.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -64,23 +65,6 @@ public class MenuFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 filterMenus();
                 return true;
-            }
-        });
-
-        btnCreateMenu = view.findViewById(R.id.btnCreateMenu);
-        btnCart = view.findViewById(R.id.btnCart);
-
-        btnCart.setOnClickListener(v -> {
-            // Navigate to CartFragment
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).loadFragment(new CartFragment());
-            }
-        });
-
-        btnCreateMenu.setOnClickListener(v -> {
-            // Navigate to CreateMenuFragment
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).loadFragment(new CreateMenuFragment());
             }
         });
 
@@ -181,12 +165,13 @@ public class MenuFragment extends Fragment {
     }
 
     private void updateCartCount() {
+        MenuItem cartAmount = navigationView.getMenu().findItem(R.id.nav_cart);
         List<Menu> cart = CartStorage.getCart(requireContext());
         int count = 0;
         for (Menu item : cart) {
             count += item.getQuantity();
         }
-        btnCart.setText("Cart (" + count + ")");
+        cartAmount.setTitle("Cart (" + count + ")");
     }
 
     public void updateList(List<Menu> newList) {

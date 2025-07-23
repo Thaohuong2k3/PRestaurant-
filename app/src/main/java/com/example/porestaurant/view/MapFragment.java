@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,7 +44,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private Button btnGetLocationAndRoute;
     private LatLng staticDestination = new LatLng(37.7749, -122.4194); // San Francisco
     private LatLng currentLocation;
 
@@ -59,7 +57,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
-        btnGetLocationAndRoute = view.findViewById(R.id.btnGetLocationAndRoute);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -68,8 +65,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
         }
         mapFragment.getMapAsync(this);
-
-        btnGetLocationAndRoute.setOnClickListener(v -> getCurrentLocationAndShowRoute());
     }
 
     @Override
@@ -96,7 +91,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void getCurrentLocationAndShowRoute() {
+    public void getCurrentLocationAndShowRoute() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             checkLocationPermission();
@@ -208,4 +203,4 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
-} 
+}

@@ -6,17 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.porestaurant.R;
 import com.example.porestaurant.model.CartStorage;
 import com.example.porestaurant.model.Menu;
-
 import java.util.List;
 
 public class CartFragment extends Fragment {
@@ -24,7 +21,7 @@ public class CartFragment extends Fragment {
     private TextView txtTotal;
     private CartAdapter cartAdapter;
     private List<Menu> cartItems;
-    private Button btnReturn;
+    private Button btnCheckout;
 
     @Nullable
     @Override
@@ -37,14 +34,7 @@ public class CartFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         recyclerCart = view.findViewById(R.id.recyclerCart);
         txtTotal = view.findViewById(R.id.txtTotal);
-        btnReturn = view.findViewById(R.id.btnReturn);
-        btnReturn.setOnClickListener(v -> {
-            if (requireActivity().getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                requireActivity().getSupportFragmentManager().popBackStack();
-            } else {
-                requireActivity().onBackPressed();
-            }
-        });
+        btnCheckout = view.findViewById(R.id.btnCheckout);
 
         cartItems = CartStorage.getCart(requireContext());
         cartAdapter = new CartAdapter(requireContext(), cartItems, this::updateTotal);
@@ -52,6 +42,26 @@ public class CartFragment extends Fragment {
         recyclerCart.setAdapter(cartAdapter);
 
         updateTotal();
+
+        btnCheckout.setOnClickListener(v -> {
+            // Clear the cart
+            cartItems.clear();
+            CartStorage.saveCart(requireContext(), cartItems);
+            cartAdapter.notifyDataSetChanged();
+            updateTotal();
+
+            // Navigate to MapFragment
+            MapFragment mapFragment = new MapFragment();
+            if (requireActivity() instanceof MainActivity) {
+                ((MainActivity) requireActivity()).loadFragment(mapFragment);
+                // Trigger the route logic after a slight delay to ensure map is ready
+                view.post(() -> {
+                    if (mapFragment.isAdded()) {
+                        mapFragment.getCurrentLocationAndShowRoute();
+                    }
+                });
+            }
+        });
     }
 
     public void updateTotal() {
@@ -60,5 +70,6 @@ public class CartFragment extends Fragment {
             total += item.getPrice() * item.getQuantity();
         }
         txtTotal.setText(String.format("Total: $%.2f", total));
+        btnCheckout.setVisibility(total > 0 ? View.VISIBLE : View.GONE);
     }
-} 
+}

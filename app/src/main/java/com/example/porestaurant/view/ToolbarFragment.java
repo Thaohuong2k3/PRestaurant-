@@ -36,8 +36,6 @@ public class ToolbarFragment extends Fragment {
     }
 
     private ImageView hamburgerMenu;
-    private ImageView searchIcon;
-    private ImageView filterIcon;
     private DrawerLayout drawerLayout;
 
     @Nullable
@@ -60,25 +58,13 @@ public class ToolbarFragment extends Fragment {
 
     private void initViews(View view) {
         hamburgerMenu = view.findViewById(R.id.iv_hamburger);
-        searchIcon = view.findViewById(R.id.iv_search);
-        filterIcon = view.findViewById(R.id.iv_filter);
+//        searchIcon = view.findViewById(R.id.iv_search);
+//        filterIcon = view.findViewById(R.id.iv_filter);
     }
 
     private void setupClickListeners() {
         hamburgerMenu.setOnClickListener(v -> {
             drawerLayout.openDrawer(GravityCompat.START);
-        });
-
-        searchIcon.setOnClickListener(v -> {
-            if (toolbarListener != null) {
-                toolbarListener.onSearchClicked();
-            }
-        });
-
-        filterIcon.setOnClickListener(v -> {
-            if (toolbarListener != null) {
-                toolbarListener.onFilterClicked();
-            }
         });
     }
 }

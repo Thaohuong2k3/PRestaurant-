@@ -5,18 +5,18 @@
         android:title="User Profile" />
     <item
         android:id="@+id/nav_cart"
-        android:icon="@drawable/ic_home"
-        android:title="Cart" />
+        android:icon="@drawable/ic_cart"
+        android:title="Cart (0)" />
     <item
         android:id="@+id/nav_menu"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/ic_restaurant_menu"
         android:title="Menu" />
     <item
         android:id="@+id/nav_table"
-        android:icon="@drawable/ic_create"
+        android:icon="@drawable/ic_table_menu"
         android:title="Table" />
     <item
         android:id="@+id/nav_logout"
-        android:icon="@drawable/ic_login"
+        android:icon="@drawable/ic_logout"
         android:title="Logout" />
 </menu>

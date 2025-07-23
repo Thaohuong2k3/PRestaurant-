@@ -2,6 +2,7 @@ package com.example.porestaurant.network;
 
 import com.example.porestaurant.model.Menu;
 import com.example.porestaurant.model.Category;
+import com.example.porestaurant.model.TableDTO;
 import com.example.porestaurant.model.User;
 import com.example.porestaurant.model.LoginRequest;
 import com.example.porestaurant.model.GoogleLoginRequest;
@@ -10,6 +11,9 @@ import com.example.porestaurant.model.ForgotPasswordRequest;
 import com.example.porestaurant.model.TableBookingRequest;
 import com.example.porestaurant.model.TableStatusUpdateRequest;
 import com.example.porestaurant.model.Admin;
+import com.example.porestaurant.model.DirectionsResponse;
+import com.example.porestaurant.model.VerifyOtpRequest;
+
 
 import java.util.List;
 
@@ -66,16 +70,6 @@ public interface ApiService {
 
     @DELETE("Menu/{id}")
     Call<Void> deleteMenu(@Path("id") int id);
-
-    @Multipart
-    @POST("menu")
-    Call<Menu> createMenu(
-            @Part("name") RequestBody name,
-            @Part("description") RequestBody description,
-            @Part("price") RequestBody price,
-            @Part("categoryId") RequestBody categoryId,
-            @Part("isAvailable") RequestBody isAvailable,
-            @Part MultipartBody.Part image);
 
     @Multipart
     @PUT("menu/{id}")

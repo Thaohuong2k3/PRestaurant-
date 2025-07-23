@@ -15,16 +15,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
-            android:id="@+id/btnCart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cart (0)"
-            android:backgroundTint="?attr/colorPrimary"
-            android:textColor="@android:color/white"
-            android:paddingHorizontal="12dp"
-            android:elevation="4dp" />
-
         <TextView
             android:id="@+id/txtCartCount"
             android:layout_width="18dp"
@@ -74,20 +64,6 @@
         android:paddingTop="8dp"
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/recyclerCategory"
-        app:layout_constraintBottom_toTopOf="@id/btnCreateMenu"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Create Menu Button -->
-    <Button
-        android:id="@+id/btnCreateMenu"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Create Menu"
-        android:backgroundTint="?attr/colorPrimary"
-        android:textColor="@android:color/white"
-        android:elevation="4dp"
-        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
