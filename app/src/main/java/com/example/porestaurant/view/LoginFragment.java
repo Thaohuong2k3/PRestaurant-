@@ -46,28 +46,37 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Initialize views
         edtEmail = view.findViewById(R.id.edtEmail);
         edtPassword = view.findViewById(R.id.edtPassword);
         btnLogin = view.findViewById(R.id.btnLogin);
         btnGoogleLogin = view.findViewById(R.id.btnGoogleLogin);
         chkRemember = view.findViewById(R.id.chkRemember);
+
         userRepository = new UserRepository();
         sharedPreferences = requireContext().getSharedPreferences("LOGIN_PREF", 0);
 
-        // Auto fill nếu Remember Me đã lưu
+        // Auto fill if Remember Me was saved
         String savedEmail = sharedPreferences.getString("email", "");
         String savedPassword = sharedPreferences.getString("password", "");
         boolean isRemember = sharedPreferences.getBoolean("remember", false);
         edtEmail.setText(savedEmail);
         edtPassword.setText(savedPassword);
         chkRemember.setChecked(isRemember);
+
+        // Navigation to register
         TextView tvRegister = view.findViewById(R.id.tvRegister);
         tvRegister.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).loadFragment(new RegisterFragment());
             }
         });
+
+        // Regular login button
         btnLogin.setOnClickListener(v -> doLogin());
+
+        // Navigation to forgot password
         TextView tvForgot = view.findViewById(R.id.tvForgot);
         tvForgot.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
@@ -75,34 +84,65 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        // Google Sign-In config (THAY client_id web thật của bạn)
+        // Google Sign-In configuration (using the same working config from Activity)
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com") // Cái này phải là Web client ID
+                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(requireContext(), gso);
 
-        // Xử lý kết quả đăng nhập Google
+        // Handle Google Sign-In result with Activity constants
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == getActivity().RESULT_OK && result.getData() != null) {
+                    Log.d("GOOGLE_LOGIN", "Result code: " + result.getResultCode());
+
+                    // Import and use Activity constants
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
                         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
                         try {
                             GoogleSignInAccount account = task.getResult(ApiException.class);
+                            Log.d("GOOGLE_LOGIN", "Account: " + (account != null ? account.getEmail() : "null"));
                             doLoginWithGoogle(account);
                         } catch (ApiException e) {
+                            Log.e("GOOGLE_LOGIN", "ApiException: " + e.getStatusCode() + " - " + e.getMessage());
                             Toast.makeText(requireContext(), "Đăng nhập Google thất bại! " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
-                            Log.e("GOOGLE_LOGIN", "Lỗi Google login", e);
                         }
                     } else {
-                        Toast.makeText(requireContext(), "Google login canceled!", Toast.LENGTH_SHORT).show();
+                        // Also check if we have valid data even with different result code
+                        if (result.getData() != null) {
+                            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                            try {
+                                GoogleSignInAccount account = task.getResult(ApiException.class);
+                                if (account != null) {
+                                    Log.d("GOOGLE_LOGIN", "Found valid account despite result code: " + result.getResultCode());
+                                    doLoginWithGoogle(account);
+                                    return;
+                                }
+                            } catch (ApiException e) {
+                                Log.e("GOOGLE_LOGIN", "No valid account found: " + e.getStatusCode());
+                            }
+                        }
+
+                        Log.e("GOOGLE_LOGIN", "Login canceled or failed. Result code: " + result.getResultCode());
+                        Toast.makeText(requireContext(), "Google login canceled or failed!", Toast.LENGTH_SHORT).show();
                     }
                 });
 
+        // Google login button click with better debugging
         btnGoogleLogin.setOnClickListener(v -> {
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            googleSignInLauncher.launch(signInIntent);
+            Log.d("GOOGLE_LOGIN", "Google login button clicked");
+            try {
+                // Clear previous sign-in to force account selection
+                mGoogleSignInClient.signOut().addOnCompleteListener(requireActivity(), task -> {
+                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                    Log.d("GOOGLE_LOGIN", "Launching sign-in intent");
+                    googleSignInLauncher.launch(signInIntent);
+                });
+            } catch (Exception e) {
+                Log.e("GOOGLE_LOGIN", "Error launching Google sign-in", e);
+                Toast.makeText(requireContext(), "Error starting Google login: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -123,12 +163,13 @@ public class LoginFragment extends Fragment {
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    // Luôn lưu thông tin user
+                    // Always save user info
                     editor.putInt("userId", user.getUserID());
                     editor.putString("fullName", user.getFullName());
                     editor.putString("email", user.getEmail());
                     editor.putString("role", user.getRole());
                     editor.apply();
+
                     if (chkRemember.isChecked()) {
                         editor.putString("password", password);
                         editor.putBoolean("remember", true);
@@ -153,6 +194,7 @@ public class LoginFragment extends Fragment {
                     }
                 });
             }
+
             @Override
             public void onError(String error) {
                 if (getActivity() == null) return;
@@ -175,7 +217,7 @@ public class LoginFragment extends Fragment {
             fullName = "Hello User";
         }
 
-        // Updated request constructor with 4 params
+        // Create request with all 4 parameters (using the working implementation from Activity)
         GoogleLoginRequest request = new GoogleLoginRequest(email, password, idToken, fullName);
 
         userRepository.googleLogin(request, new UserRepository.LoginCallback() {
@@ -184,15 +226,17 @@ public class LoginFragment extends Fragment {
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
+                    // Save user info
                     editor.putInt("userId", user.getUserID());
                     editor.putString("fullName", user.getFullName());
                     editor.putString("email", user.getEmail());
                     editor.putString("role", user.getRole());
                     editor.apply();
 
+                    // Handle Remember Me for Google login
                     if (chkRemember.isChecked()) {
                         editor.putBoolean("remember", true);
-                        editor.putString("password", "123123"); // optional default password
+                        editor.putString("password", "123123"); // Optional default password
                     } else {
                         editor.remove("password");
                         editor.putBoolean("remember", false);
@@ -223,4 +267,4 @@ public class LoginFragment extends Fragment {
             }
         });
     }
-} 
+}
