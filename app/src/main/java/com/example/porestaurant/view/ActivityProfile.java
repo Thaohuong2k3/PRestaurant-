@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.porestaurant.R;
 import com.example.porestaurant.model.UpdateUserRequest;
 import com.example.porestaurant.repository.UserRepository;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 public class ActivityProfile extends AppCompatActivity {
     private EditText edtProfileFullName, edtProfilePassword, edtProfileConfirmPass;
@@ -22,6 +25,7 @@ public class ActivityProfile extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private UserRepository userRepository;
     private int userId;
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,33 @@ public class ActivityProfile extends AppCompatActivity {
         btnProfileBack.setOnClickListener(v -> {
             onBackPressed(); // hoặc finish();
         });
+        // Khai báo giống hệt như LoginActivity!
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        Button btnLogout = findViewById(R.id.btnProfileLogout);
+        btnLogout.setOnClickListener(v -> signOutGoogleAndClearUser());
     }
+
+    private void signOutGoogleAndClearUser() {
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            mGoogleSignInClient.revokeAccess().addOnCompleteListener(this, task1 -> {
+                // Xoá dữ liệu user local nếu có
+                SharedPreferences sharedPreferences = getSharedPreferences("LOGIN_PREF", MODE_PRIVATE);
+                sharedPreferences.edit().clear().apply();
+
+                // Quay lại LoginActivity
+                Intent intent = new Intent(ActivityProfile.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            });
+        });
+    }
+
 
     private void doUpdateProfile() {
         String newFullName = edtProfileFullName.getText().toString().trim();

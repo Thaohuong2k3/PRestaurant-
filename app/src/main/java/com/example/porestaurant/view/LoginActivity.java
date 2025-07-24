@@ -63,15 +63,14 @@ public class LoginActivity extends AppCompatActivity {
         tvForgot.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
         });
-
-        // Google Sign-In config (THAY client_id web thật của bạn)
+        // 1. Khai báo GoogleSignInOptions và GoogleSignInClient
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com") // Cái này phải là Web client ID
+                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // Xử lý kết quả đăng nhập Google
+        // 2. Xử lý kết quả Google Login
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -82,18 +81,21 @@ public class LoginActivity extends AppCompatActivity {
                             doLoginWithGoogle(account);
                         } catch (ApiException e) {
                             Toast.makeText(this, "Đăng nhập Google thất bại! " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
-                            Log.e("GOOGLE_LOGIN", "Lỗi Google login", e);
                         }
                     } else {
                         Toast.makeText(this, "Google login canceled!", Toast.LENGTH_SHORT).show();
                     }
                 });
 
+        // 3. Bấm login Google
+        Button btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
         btnGoogleLogin.setOnClickListener(v -> {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             googleSignInLauncher.launch(signInIntent);
         });
     }
+
+
 
     private void doLogin() {
         String email = edtEmail.getText().toString().trim();
@@ -144,11 +146,15 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         String email = account.getEmail();
-        String password = "Huong11@"; // Đúng như backend bạn yêu cầu
-        String idToken = account.getIdToken(); // Bắt buộc đã cấu hình requestIdToken
+        String password = "Huong11@";
+        String idToken = account.getIdToken();
+        String fullName = account.getDisplayName();
+        if (fullName == null || fullName.isEmpty()) {
+            fullName = "Hello User";
+        }
 
-        // GoogleLoginRequest (email, password, fullName, idToken)
-        GoogleLoginRequest request = new GoogleLoginRequest(email, password, idToken);
+// Tạo request có đầy đủ 4 tham số
+        GoogleLoginRequest request = new GoogleLoginRequest(email, password, idToken, fullName);
 
         userRepository.googleLogin(request, new UserRepository.LoginCallback() {
             @Override
