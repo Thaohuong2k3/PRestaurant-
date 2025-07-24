@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +34,18 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setupYearSpinner();
         setupBottomNavigation();
         updateCurrentDate();
+
+        ImageButton btnLogout = findViewById(R.id.btn_logout);
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AdminDashboardActivity.this, MainActivity.class);
+                intent.putExtra("logout", true);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void initViews() {
@@ -94,13 +107,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             }
             else if (id == R.id.nav_category) {
                 fragment = new CategoryListFragment();
-            }
-            else if (id == R.id.nav_logout)  {
-                Intent intent = new Intent(AdminDashboardActivity.this, MainActivity.class);
-                intent.putExtra("logout", true);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
             }
 
             if (fragment != null) {
