@@ -1,11 +1,13 @@
 package com.example.porestaurant.view;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -92,6 +94,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
             else if (id == R.id.nav_category) {
                 fragment = new CategoryListFragment();
             }
+            else if (id == R.id.nav_logout)  {
+
+            }
 
             if (fragment != null) {
                 Bundle args = new Bundle();
@@ -121,4 +126,5 @@ public class AdminDashboardActivity extends AppCompatActivity {
         BottomNavigationView nav = findViewById(R.id.admin_bottom_nav);
         nav.setSelectedItemId(nav.getSelectedItemId());
     }
+
 }
