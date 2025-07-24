@@ -23,7 +23,7 @@ import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity{
 
-    public static final String PREFS_NAME = "userPrefs";
+    public static final String PREFS_NAME = "LOGIN_PREF";
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity{
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
 
-        SharedPreferences sharedPreferences = getSharedPreferences("LOGIN_PREF", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean isLoggedIn = sharedPreferences.contains("email"); // or "userId"
 
         menu.findItem(R.id.nav_login).setVisible(!isLoggedIn);
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity{
     private void clearUserSessionAndLogout() {
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        editor.remove("LOGIN_PREF");
+        editor.clear();
         editor.apply();
 
         Toast.makeText(this, "Logout Successfully!", Toast.LENGTH_SHORT).show();

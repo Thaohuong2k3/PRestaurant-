@@ -45,7 +45,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private LatLng staticDestination = new LatLng(37.7749, -122.4194); // San Francisco
+    private LatLng staticDestination = new LatLng(15.969121844489093, 108.26098374935198); // FPT University, Da Nang
     private LatLng currentLocation;
     private ProgressBar loadingProgressBar;
 
