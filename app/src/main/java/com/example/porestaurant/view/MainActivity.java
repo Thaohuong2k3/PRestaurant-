@@ -33,6 +33,10 @@ public class MainActivity extends AppCompatActivity{
 
         setContentView(R.layout.activity_main);
 
+        if (getIntent().getBooleanExtra("logout", false)) {
+            clearUserSessionAndLogout();
+            return; // Exit early so it doesn’t load fragment again
+        }
 
         // Initialize DrawerLayout and NavigationView
         drawerLayout = findViewById(R.id.drawer_layout);
