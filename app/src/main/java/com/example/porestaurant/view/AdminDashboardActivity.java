@@ -54,7 +54,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private void updateCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM dd, yyyy", Locale.getDefault());
-        String currentDate = sdf.format(new Date());
+        String currentDate = sdf.format(new Date()); // Displays 01:01 AM +07, Friday, July 25, 2025
         txtCurrentDate.setText(currentDate);
     }
 
@@ -103,9 +103,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
             } else if (id == R.id.nav_menu_stats) {
                 fragment = new TopMenuItemsFragment();
             } else if (id == R.id.nav_manage_table) {
-                //TODO
-            }
-            else if (id == R.id.nav_category) {
+                fragment = new ManageTableFragment();
+            } else if (id == R.id.nav_category) {
                 fragment = new CategoryListFragment();
             }
 
@@ -137,5 +136,4 @@ public class AdminDashboardActivity extends AppCompatActivity {
         BottomNavigationView nav = findViewById(R.id.admin_bottom_nav);
         nav.setSelectedItemId(nav.getSelectedItemId());
     }
-
 }
