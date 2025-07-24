@@ -166,12 +166,17 @@ public class LoginFragment extends Fragment {
             Toast.makeText(requireContext(), "Google account null!", Toast.LENGTH_SHORT).show();
             return;
         }
-        String email = account.getEmail();
-        String password = "Huong11@"; // Đúng như backend bạn yêu cầu
-        String idToken = account.getIdToken(); // Bắt buộc đã cấu hình requestIdToken
 
-        // GoogleLoginRequest (email, password, fullName, idToken)
-        GoogleLoginRequest request = new GoogleLoginRequest(email, password, idToken);
+        String email = account.getEmail();
+        String password = "Huong11@"; // Same default password used in backend
+        String idToken = account.getIdToken();
+        String fullName = account.getDisplayName();
+        if (fullName == null || fullName.isEmpty()) {
+            fullName = "Hello User";
+        }
+
+        // Updated request constructor with 4 params
+        GoogleLoginRequest request = new GoogleLoginRequest(email, password, idToken, fullName);
 
         userRepository.googleLogin(request, new UserRepository.LoginCallback() {
             @Override
@@ -179,18 +184,15 @@ public class LoginFragment extends Fragment {
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    // Lưu thông tin user
                     editor.putInt("userId", user.getUserID());
                     editor.putString("fullName", user.getFullName());
                     editor.putString("email", user.getEmail());
                     editor.putString("role", user.getRole());
                     editor.apply();
 
-                    // Nếu có Remember Me (tuỳ bạn có tích hợp hay không)
                     if (chkRemember.isChecked()) {
                         editor.putBoolean("remember", true);
-                        // Nếu bạn có password mặc định cho Google, có thể lưu luôn (không khuyến khích)
-                        editor.putString("password", "123123"); // Hoặc password Google mặc định của bạn
+                        editor.putString("password", "123123"); // optional default password
                     } else {
                         editor.remove("password");
                         editor.putBoolean("remember", false);
@@ -198,13 +200,12 @@ public class LoginFragment extends Fragment {
                     editor.apply();
 
                     Toast.makeText(requireContext(), "Đăng nhập Google thành công!", Toast.LENGTH_SHORT).show();
+
                     if (user.getRole().equalsIgnoreCase("Admin")) {
-                        // Navigate to admin dashboard
                         Intent intent = new Intent(requireContext(), AdminDashboardActivity.class);
                         startActivity(intent);
-                        requireActivity().finish(); // Optional: close login activity
+                        requireActivity().finish();
                     } else {
-                        // Navigate to profile for customers
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).updateNavigationMenu();
                             ((MainActivity) getActivity()).loadFragment(new MenuFragment());
@@ -216,7 +217,9 @@ public class LoginFragment extends Fragment {
             @Override
             public void onError(String error) {
                 if (getActivity() == null) return;
-                getActivity().runOnUiThread(() -> Toast.makeText(requireContext(), "Google login fail: " + error, Toast.LENGTH_LONG).show());
+                getActivity().runOnUiThread(() ->
+                        Toast.makeText(requireContext(), "Google login fail: " + error, Toast.LENGTH_LONG).show()
+                );
             }
         });
     }

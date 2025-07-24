@@ -19,6 +19,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.porestaurant.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity{
@@ -27,26 +30,35 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
+    private GoogleSignInClient mGoogleSignInClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
+        // Initialize DrawerLayout and NavigationView
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+
+        setupNavigationView();
+
         if (getIntent().getBooleanExtra("logout", false)) {
             clearUserSessionAndLogout();
             return; // Exit early so it doesn’t load fragment again
         }
 
-        // Initialize DrawerLayout and NavigationView
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-
         updateNavigationMenu();
 
         // Load initial fragment (Menu)
         loadFragment(new MenuFragment());
-        setupNavigationView();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
     public void updateNavigationMenu() {
@@ -69,15 +81,20 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void clearUserSessionAndLogout() {
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.clear();
-        editor.apply();
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            mGoogleSignInClient.revokeAccess().addOnCompleteListener(this, revokeTask -> {
+                SharedPreferences pref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.clear();
+                editor.apply();
 
-        Toast.makeText(this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
-        updateNavigationMenu();
-        logOut();
+                Toast.makeText(this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
+                updateNavigationMenu();
+                logOut();
+            });
+        });
     }
+
 
     private void setupNavigationView() {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
