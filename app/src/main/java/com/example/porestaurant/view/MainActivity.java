@@ -111,6 +111,8 @@ public class MainActivity extends AppCompatActivity{
                     clearUserSessionAndLogout();
                 } else if (itemId == R.id.nav_login){
                     loadFragment(new LoginFragment());
+                } else if (itemId == R.id.nav_table) {
+                    loadFragment(new BookingFragment()); // Navigate to BookingFragment
                 }
 
                 // Table can be handled later
