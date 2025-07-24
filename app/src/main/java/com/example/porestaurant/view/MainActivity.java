@@ -32,21 +32,22 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        setupNavigationView();
         if (getIntent().getBooleanExtra("logout", false)) {
             clearUserSessionAndLogout();
             return; // Exit early so it doesn’t load fragment again
         }
 
         // Initialize DrawerLayout and NavigationView
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+
 
         updateNavigationMenu();
 
         // Load initial fragment (Menu)
         loadFragment(new MenuFragment());
-        setupNavigationView();
+
     }
 
     public void updateNavigationMenu() {
