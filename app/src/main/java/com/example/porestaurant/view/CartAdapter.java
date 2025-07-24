@@ -84,13 +84,19 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         byte[] imageData = menu.getImageData();
         if (imageData != null && imageData.length > 0) {
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-            Glide.with(context)
-                    .load(bitmap)
-                    .apply(new RequestOptions()
-                            .transform(new RoundedCorners(12))
-                            .placeholder(R.drawable.placeholder_food)
-                            .error(R.drawable.no_image))
-                    .into(holder.imgMenu);
+            if (bitmap != null) {
+                Glide.with(context)
+                        .load(bitmap)
+                        .apply(new RequestOptions()
+                                .transform(new RoundedCorners(12))
+                                .placeholder(R.drawable.placeholder_food)
+                                .error(R.drawable.no_image))
+                        .into(holder.imgMenu);
+            } else {
+                Glide.with(context)
+                        .load(R.drawable.no_image)
+                        .into(holder.imgMenu);
+            }
         } else {
             Glide.with(context)
                     .load(R.drawable.placeholder_food)
@@ -98,6 +104,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                     .into(holder.imgMenu);
         }
     }
+
 
     private void updateItemDisplay(CartViewHolder holder, Menu menu) {
         holder.tvQuantity.setText(String.valueOf(menu.getQuantity()));
