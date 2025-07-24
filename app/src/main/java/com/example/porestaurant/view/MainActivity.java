@@ -44,6 +44,12 @@ public class MainActivity extends AppCompatActivity{
 
         setupNavigationView();
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
         if (getIntent().getBooleanExtra("logout", false)) {
             clearUserSessionAndLogout();
             return; // Exit early so it doesn’t load fragment again
@@ -54,11 +60,7 @@ public class MainActivity extends AppCompatActivity{
         // Load initial fragment (Menu)
         loadFragment(new MenuFragment());
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
     }
 
     public void updateNavigationMenu() {
