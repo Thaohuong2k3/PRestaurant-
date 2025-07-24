@@ -32,7 +32,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
-
+                    <ImageButton
+                        android:id="@+id/btn_logout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_logout"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_marginEnd="8dp"
+                        android:onClick="onLogoutClicked"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
