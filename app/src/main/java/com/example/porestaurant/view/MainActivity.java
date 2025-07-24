@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity{
         loadFragment(new LoginFragment());
     }
 
-    private void clearUserSessionAndLogout() {
+    public void clearUserSessionAndLogout() {
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.clear();
