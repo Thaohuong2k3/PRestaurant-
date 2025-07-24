@@ -3,6 +3,7 @@ package com.example.porestaurant.view;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -20,7 +21,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.porestaurant.R;
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity implements ToolbarFragment.ToolbarListener{
+public class MainActivity extends AppCompatActivity{
 
     public static final String PREFS_NAME = "userPrefs";
     private DrawerLayout drawerLayout;
@@ -32,23 +33,30 @@ public class MainActivity extends AppCompatActivity implements ToolbarFragment.T
 
         setContentView(R.layout.activity_main);
 
-        checkUserSession();
 
         // Initialize DrawerLayout and NavigationView
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+
+        updateNavigationMenu();
 
         // Load initial fragment (Menu)
         loadFragment(new MenuFragment());
         setupNavigationView();
     }
 
-    private void checkUserSession() {
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    public void updateNavigationMenu() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
 
-        if (!pref.contains("user")) {
-            logOut();
-        }
+        SharedPreferences sharedPreferences = getSharedPreferences("LOGIN_PREF", MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.contains("email"); // or "userId"
+
+        menu.findItem(R.id.nav_login).setVisible(!isLoggedIn);
+        menu.findItem(R.id.nav_logout).setVisible(isLoggedIn);
+        menu.findItem(R.id.nav_profile).setVisible(isLoggedIn);
+        menu.findItem(R.id.nav_cart).setVisible(isLoggedIn);
+        menu.findItem(R.id.nav_table).setVisible(isLoggedIn);
     }
 
     private void logOut() {
@@ -59,10 +67,11 @@ public class MainActivity extends AppCompatActivity implements ToolbarFragment.T
     private void clearUserSessionAndLogout() {
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        editor.remove("user");
+        editor.remove("LOGIN_PREF");
         editor.apply();
 
         Toast.makeText(this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
+        updateNavigationMenu();
         logOut();
     }
 
@@ -79,7 +88,10 @@ public class MainActivity extends AppCompatActivity implements ToolbarFragment.T
                     loadFragment(new MenuFragment());
                 } else if (itemId == R.id.nav_logout) {
                     clearUserSessionAndLogout();
+                } else if (itemId == R.id.nav_login){
+                    loadFragment(new LoginFragment());
                 }
+
                 // Table can be handled later
                 drawerLayout.closeDrawers();
                 return true;
@@ -92,15 +104,5 @@ public class MainActivity extends AppCompatActivity implements ToolbarFragment.T
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
-    }
-
-    @Override
-    public void onSearchClicked() {
-
-    }
-
-    @Override
-    public void onFilterClicked() {
-
     }
 }

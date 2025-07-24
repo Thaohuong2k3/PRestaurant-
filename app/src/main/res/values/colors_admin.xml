@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Admin Theme Colors -->
+    <color name="admin_primary">#1976D2</color>
+    <color name="admin_primary_dark">#1565C0</color>
+    <color name="admin_primary_light">#E3F2FD</color>
+    <color name="admin_accent">#FF5722</color>
+
+    <!-- Admin Background Colors -->
+    <color name="admin_background">#F5F7FA</color>
+    <color name="admin_card_background">#FFFFFF</color>
+    <color name="admin_surface">#FFFFFF</color>
+
+    <!-- Admin Text Colors -->
+    <color name="admin_text_primary">#212121</color>
+    <color name="admin_text_secondary">#757575</color>
+    <color name="admin_text_hint">#BDBDBD</color>
+
+    <!-- Admin Status Colors -->
+    <color name="admin_success">#4CAF50</color>
+    <color name="admin_warning">#FF9800</color>
+    <color name="admin_error">#F44336</color>
+    <color name="admin_info">#2196F3</color>
+
+    <!-- Admin UI Colors -->
+    <color name="admin_divider">#E0E0E0</color>
+    <color name="admin_shadow">#1A000000</color>
+</resources>

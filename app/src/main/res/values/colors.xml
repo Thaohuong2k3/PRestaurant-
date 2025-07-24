@@ -27,10 +27,8 @@
     <!-- Background Colors -->
     <color name="background_color">#FFFFFF</color>
     <color name="surface_color">#F5F5F5</color>
-    <color name="divider_color">#E0E0E0</color>
 
     <!-- Status Colors -->
-    <color name="error_color">#B00020</color>
     <color name="success_color">#4CAF50</color>
 
     <!-- Gradient Colors -->
@@ -67,4 +65,14 @@
 
     <!-- Ripple Effect -->
     <color name="ripple_color">#33000000</color>
+
+    <color name="primary_dark">#E55A2B</color>
+
+    <color name="price_color">#FF6B35</color>
+    <color name="error_color">#F44336</color>
+
+    <color name="divider_color">#E0E0E0</color>
+
+    <color name="shimmer_color">#E0E0E0</color>
+    <color name="shimmer_highlight">#F5F5F5</color>
 </resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Medal Colors -->
+    <color name="admin_gold">#FFD700</color>
+    <color name="admin_silver">#C0C0C0</color>
+    <color name="admin_bronze">#CD7F32</color>
+
+    <!-- Chart Colors -->
+    <color name="admin_chart_color1">#4CAF50</color>
+    <color name="admin_chart_color2">#2196F3</color>
+    <color name="admin_chart_color3">#FF9800</color>
+    <color name="admin_chart_color4">#9C27B0</color>
+    <color name="admin_chart_color5">#F44336</color>
+</resources>

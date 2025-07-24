@@ -24,6 +24,8 @@ import com.example.porestaurant.model.Menu;
 import com.example.porestaurant.network.ApiClient;
 import com.example.porestaurant.network.ApiService;
 import com.example.porestaurant.repository.MenuRepository;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,7 +37,7 @@ import java.util.List;
 
 public class MenuManagementFragment extends Fragment {
     private RecyclerView rvMenu;
-    private ImageButton fabAdd;
+    private ExtendedFloatingActionButton fabAdd;
     private MenuRepository repo;
     private MenuAdapter adapter;
     private List<Category> categoryList = new ArrayList<>();
@@ -288,7 +290,7 @@ public class MenuManagementFragment extends Fragment {
         class VH extends RecyclerView.ViewHolder {
             ImageView ivImage;
             TextView tvName, tvPrice, tvDescription, tvCategory, tvStatus;
-            ImageButton btnEdit, btnDelete;
+            MaterialButton btnEdit, btnDelete;
             VH(@NonNull View it) {
                 super(it);
                 ivImage      = it.findViewById(R.id.ivMenuImage);

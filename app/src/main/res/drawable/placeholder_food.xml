@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M0,0h120v120h-120z"/>
+
+    <!-- Image icon -->
+    <path
+        android:fillColor="#9E9E9E"
+        android:pathData="M30,30h60v60h-60z"/>
+
+    <!-- Mountains -->
+    <path
+        android:fillColor="#BDBDBD"
+        android:pathData="M35,80l15,-20l10,15l10,-10l15,15z"/>
+
+
+</vector>

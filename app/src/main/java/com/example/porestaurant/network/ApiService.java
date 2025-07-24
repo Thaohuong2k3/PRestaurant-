@@ -29,7 +29,7 @@ public interface ApiService {
     @POST("users/login")
     Call<User> login(@Body LoginRequest request);
 
-    @POST("users/google-login")
+    @POST("users/login-google")
     Call<User> loginWithGoogle(@Body GoogleLoginRequest request);
 
     @POST("users/register")
