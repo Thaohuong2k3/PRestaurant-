@@ -112,6 +112,9 @@ public interface ApiService {
     @PUT("tables/{id}/cancel")
     Call<TableDTO> cancelTable(@Path("id") int id);
 
+    @GET("tables")
+    Call<List<TableDTO>> getAllTables();
+
     // ====== MAP ENDPOINTS ======
     @GET("maps/api/directions/json")
     Call<DirectionsResponse> getDirections(
