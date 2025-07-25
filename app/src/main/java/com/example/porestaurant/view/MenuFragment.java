@@ -103,9 +103,16 @@ public class MenuFragment extends Fragment {
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     showShimmer(false);
-                    allMenus = menuList;
 
-                    menuAdapter = new MenuAdapter(requireContext(), menuList, menu -> {
+                    // Filter only available menus
+                    allMenus = new ArrayList<>();
+                    for (Menu menu : menuList) {
+                        if (menu.isAvailable()) {
+                            allMenus.add(menu);
+                        }
+                    }
+
+                    menuAdapter = new MenuAdapter(requireContext(), allMenus, menu -> {
                         CartStorage.addToCart(requireContext(), menu);
                         Toast.makeText(requireContext(), "Added to cart: " + menu.getName(), Toast.LENGTH_SHORT).show();
                     });
