@@ -55,6 +55,17 @@ public class RegisterFragment extends Fragment {
             Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
             return;
         }
+        // Validate Gmail address
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$")) {
+            Toast.makeText(requireContext(), "Vui lòng nhập email Gmail hợp lệ!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validate password strength
+        if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$")) {
+            Toast.makeText(requireContext(), "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!", Toast.LENGTH_LONG).show();
+            return;
+        }
         if(!password.equals(confirmPass)) {
             Toast.makeText(requireContext(), "Mật khẩu xác nhận không khớp!", Toast.LENGTH_SHORT).show();
             return;

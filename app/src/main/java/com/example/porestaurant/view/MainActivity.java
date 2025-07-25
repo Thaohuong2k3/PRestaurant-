@@ -55,6 +55,16 @@ public class MainActivity extends AppCompatActivity{
             return; // Exit early so it doesn’t load fragment again
         }
 
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String role = sharedPreferences.getString("role", null);
+        if ("Admin".equalsIgnoreCase(role)) {
+            // Redirect to AdminDashboardActivity
+            Intent intent = new Intent(MainActivity.this, AdminDashboardActivity.class);
+            startActivity(intent);
+            finish(); // Prevent going back to MainActivity
+            return;
+        }
+
         updateNavigationMenu();
 
         // Load initial fragment (Menu)
