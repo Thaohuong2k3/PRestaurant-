@@ -1,6 +1,7 @@
 package com.example.porestaurant.view;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,10 @@ import com.example.porestaurant.network.ApiService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,6 +36,7 @@ import retrofit2.Response;
 
 public class ManageTableFragment extends Fragment {
 
+    private static final String TAG = "ManageTableFragment";
     private RecyclerView recyclerViewTables;
     private TableAdapter tableAdapter;
     private ApiService apiService;
@@ -59,68 +64,99 @@ public class ManageTableFragment extends Fragment {
     }
 
     private void loadTables() {
-        Call<List<TableDTO>> call = apiService.getAvailableTables(); // Modify to get all tables if needed
+        Log.d(TAG, "Loading all tables...");
+        Call<List<TableDTO>> call = apiService.getAllTables();
         call.enqueue(new Callback<List<TableDTO>>() {
             @Override
             public void onResponse(Call<List<TableDTO>> call, Response<List<TableDTO>> response) {
+                Log.d(TAG, "API Response Code: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     List<TableDTO> tables = response.body();
+                    for (TableDTO table : tables) {
+                        Log.d(TAG, "Table: " + table);
+                    }
+                    Log.d(TAG, "Received " + tables.size() + " tables: " + tables);
                     if (tables.isEmpty()) {
                         tvNoTables.setVisibility(View.VISIBLE);
                         recyclerViewTables.setVisibility(View.GONE);
+                        Log.d(TAG, "No tables found.");
                     } else {
                         tvNoTables.setVisibility(View.GONE);
                         recyclerViewTables.setVisibility(View.VISIBLE);
                         tableAdapter.updateTables(tables);
+                        Log.d(TAG, "Tables loaded successfully.");
                     }
                 } else {
+                    Log.e(TAG, "Error loading tables: " + response.code() + " - " + response.message());
                     Toast.makeText(requireContext(), "Error loading tables: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<TableDTO>> call, Throwable t) {
+                Log.e(TAG, "Connection failed: " + t.getMessage());
                 Toast.makeText(requireContext(), "Connection failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void updateTableStatus(TableDTO table, String newStatus) {
-        TableStatusUpdateRequest request = new TableStatusUpdateRequest(newStatus);
+        TableStatusUpdateRequest request = new TableStatusUpdateRequest(newStatus); // Use exact case
+        Log.d(TAG, "Updating status for Table ID: " + table.getTableId() + " from " + table.getStatus() + " to " + newStatus +
+                ", checkin: " + table.getCheckin() + ", updatedAt: " + table.getUpdatedAt());
         Call<TableDTO> call = apiService.updateTableStatus(table.getTableId(), request);
         call.enqueue(new Callback<TableDTO>() {
             @Override
             public void onResponse(Call<TableDTO> call, Response<TableDTO> response) {
                 if (response.isSuccessful()) {
+                    Log.d(TAG, "Status updated successfully for Table ID: " + table.getTableId());
                     Toast.makeText(requireContext(), "Table status updated to " + newStatus + "!", Toast.LENGTH_SHORT).show();
                     loadTables(); // Refresh table list
                 } else {
+                    Log.e(TAG, "Failed to update status: " + response.code() + " - " + response.message());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error details";
+                        Log.e(TAG, "Error details: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to read error body: " + e.getMessage());
+                    }
                     Toast.makeText(requireContext(), "Failed to update status: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<TableDTO> call, Throwable t) {
+                Log.e(TAG, "Connection failed: " + t.getMessage());
                 Toast.makeText(requireContext(), "Connection failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void cancelTable(int tableId) {
+        Log.d(TAG, "Canceling booking for Table ID: " + tableId);
         Call<TableDTO> call = apiService.cancelTable(tableId);
         call.enqueue(new Callback<TableDTO>() {
             @Override
             public void onResponse(Call<TableDTO> call, Response<TableDTO> response) {
                 if (response.isSuccessful()) {
+                    Log.d(TAG, "Booking canceled successfully for Table ID: " + tableId);
                     Toast.makeText(requireContext(), "Table booking canceled!", Toast.LENGTH_SHORT).show();
                     loadTables(); // Refresh table list
                 } else {
+                    Log.e(TAG, "Failed to cancel booking: " + response.code() + " - " + response.message());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error details";
+                        Log.e(TAG, "Error details: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to read error body: " + e.getMessage());
+                    }
                     Toast.makeText(requireContext(), "Failed to cancel booking: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<TableDTO> call, Throwable t) {
+                Log.e(TAG, "Connection failed: " + t.getMessage());
                 Toast.makeText(requireContext(), "Connection failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -183,20 +219,41 @@ public class ManageTableFragment extends Fragment {
             }
 
             void bind(TableDTO table, OnStatusChangeListener statusChangeListener, OnCancelListener cancelListener) {
-                tvTableInfo.setText("Table " + table.getTableNumber() + " (ID: " + table.getTableId() + ", Capacity: " + table.getCapacity() + ")");
-                List<String> statuses = Arrays.asList("AVAILABLE", "OCCUPIED", "RESERVED");
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(itemView.getContext(),
-                        android.R.layout.simple_spinner_item, statuses);
+                tvTableInfo.setText(table.getTableNumber()); // Display only table name
+                String currentStatus = table.getStatus();
+                List<String> statuses = new ArrayList<>();
+                if (currentStatus != null) {
+                    statuses.add(currentStatus); // Current status first
+                }
+                // Add all possible statuses, ensuring mixed case
+                statuses.addAll(Arrays.asList("Available", "Reserved", "Occupied", "Cleaning"));
+                // Remove duplicates while preserving order
+                Set<String> seen = new HashSet<>();
+                statuses = statuses.stream().filter(status -> seen.add(status)).collect(Collectors.toList());
+                // Add Cancel option (handled in spinner logic, button always visible)
+                if (statuses.contains("Cancel")) {
+                    // Ensure Cancel is only added if intended, but button is always visible per request
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(itemView.getContext(), android.R.layout.simple_spinner_item, statuses);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerStatus.setAdapter(adapter);
-                spinnerStatus.setSelection(statuses.indexOf(table.getStatus()));
+                if (currentStatus != null && statuses.contains(currentStatus)) {
+                    spinnerStatus.setSelection(statuses.indexOf(currentStatus)); // Set to current status
+                } else {
+                    spinnerStatus.setSelection(0); // Default to first (current) option
+                }
 
                 btnUpdate.setOnClickListener(v -> {
                     String newStatus = spinnerStatus.getSelectedItem().toString();
+                    if (newStatus.equals("Cancel")) {
+                        cancelListener.onCancel(table.getTableId());
+                        return;
+                    }
                     statusChangeListener.onStatusChange(table, newStatus);
                 });
 
                 btnCancel.setOnClickListener(v -> cancelListener.onCancel(table.getTableId()));
+                // Button is always visible per your request, no conditional hiding
             }
         }
     }
