@@ -23,4 +23,5 @@
         android:id="@+id/nav_category"
         android:icon="@drawable/ic_category"
         android:title="Category"/>
+
 </menu>

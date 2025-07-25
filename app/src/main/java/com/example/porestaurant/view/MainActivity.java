@@ -19,13 +19,18 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.porestaurant.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity{
 
-    public static final String PREFS_NAME = "userPrefs";
+    public static final String PREFS_NAME = "LOGIN_PREF";
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,23 +38,46 @@ public class MainActivity extends AppCompatActivity{
 
         setContentView(R.layout.activity_main);
 
-
         // Initialize DrawerLayout and NavigationView
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+
+        setupNavigationView();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("961582604276-brc2l9efh7al4emaqrhce029h02ib3n7.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        if (getIntent().getBooleanExtra("logout", false)) {
+            clearUserSessionAndLogout();
+            return; // Exit early so it doesn’t load fragment again
+        }
+
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String role = sharedPreferences.getString("role", null);
+        if ("Admin".equalsIgnoreCase(role)) {
+            // Redirect to AdminDashboardActivity
+            Intent intent = new Intent(MainActivity.this, AdminDashboardActivity.class);
+            startActivity(intent);
+            finish(); // Prevent going back to MainActivity
+            return;
+        }
 
         updateNavigationMenu();
 
         // Load initial fragment (Menu)
         loadFragment(new MenuFragment());
-        setupNavigationView();
+
+
     }
 
     public void updateNavigationMenu() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
 
-        SharedPreferences sharedPreferences = getSharedPreferences("LOGIN_PREF", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean isLoggedIn = sharedPreferences.contains("email"); // or "userId"
 
         menu.findItem(R.id.nav_login).setVisible(!isLoggedIn);
@@ -64,16 +92,21 @@ public class MainActivity extends AppCompatActivity{
         loadFragment(new LoginFragment());
     }
 
-    private void clearUserSessionAndLogout() {
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.remove("LOGIN_PREF");
-        editor.apply();
+    public void clearUserSessionAndLogout() {
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            mGoogleSignInClient.revokeAccess().addOnCompleteListener(this, revokeTask -> {
+                SharedPreferences pref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.clear();
+                editor.apply();
 
-        Toast.makeText(this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
-        updateNavigationMenu();
-        logOut();
+                Toast.makeText(this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
+                updateNavigationMenu();
+                logOut();
+            });
+        });
     }
+
 
     private void setupNavigationView() {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -90,6 +123,8 @@ public class MainActivity extends AppCompatActivity{
                     clearUserSessionAndLogout();
                 } else if (itemId == R.id.nav_login){
                     loadFragment(new LoginFragment());
+                } else if (itemId == R.id.nav_table) {
+                    loadFragment(new BookingFragment()); // Navigate to BookingFragment
                 }
 
                 // Table can be handled later

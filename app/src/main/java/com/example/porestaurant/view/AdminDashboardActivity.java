@@ -1,11 +1,15 @@
 package com.example.porestaurant.view;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -30,6 +34,18 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setupYearSpinner();
         setupBottomNavigation();
         updateCurrentDate();
+
+        ImageButton btnLogout = findViewById(R.id.btn_logout);
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AdminDashboardActivity.this, MainActivity.class);
+                intent.putExtra("logout", true);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void initViews() {
@@ -38,7 +54,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private void updateCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM dd, yyyy", Locale.getDefault());
-        String currentDate = sdf.format(new Date());
+        String currentDate = sdf.format(new Date()); // Displays 01:01 AM +07, Friday, July 25, 2025
         txtCurrentDate.setText(currentDate);
     }
 
@@ -87,9 +103,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
             } else if (id == R.id.nav_menu_stats) {
                 fragment = new TopMenuItemsFragment();
             } else if (id == R.id.nav_manage_table) {
-                //TODO
-            }
-            else if (id == R.id.nav_category) {
+                fragment = new ManageTableFragment();
+            } else if (id == R.id.nav_category) {
                 fragment = new CategoryListFragment();
             }
 

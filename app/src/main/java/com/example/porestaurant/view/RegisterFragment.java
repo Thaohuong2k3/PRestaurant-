@@ -45,6 +45,12 @@ public class RegisterFragment extends Fragment {
         String password = edtPassword.getText().toString();
         String confirmPass = edtConfirmPassword.getText().toString();
 
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$")) {
+            Toast.makeText(requireContext(), "Vui lòng nhập email Gmail hợp lệ!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
         if(fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPass.isEmpty()) {
             Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
             return;
